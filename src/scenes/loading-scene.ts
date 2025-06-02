@@ -7,7 +7,6 @@ export class LoadingScene extends Phaser.Scene {
 
   preload() {
     this.createLoadingUI();
-
     this.loadGameAssets();
   }
 
@@ -60,16 +59,16 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image('ground', 'assets/sprites/ground.jpg');
 
     this.load.spritesheet('player_idle', 'assets/animations/player/idle/player_idle.png', {
-      frameWidth: 32,
-      frameHeight: 48
+      frameWidth: 155,
+      frameHeight: 280
     });
     this.load.spritesheet('player_jump', 'assets/animations/player/jump/player_jump.png', {
-      frameWidth: 32,
-      frameHeight: 48
+      frameWidth: 155,
+      frameHeight: 280
     });
     this.load.spritesheet('player_run', 'assets/animations/player/run/player_run.png', {
-      frameWidth: 32,
-      frameHeight: 48
+      frameWidth: 155,
+      frameHeight: 280
     });
 
     this.load.on('loaderror', (file: any) => {
@@ -78,51 +77,64 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createAnimations() {
-    if (this.textures.exists('player_idle') && this.textures.get('player_idle').frameTotal > 1) {
-      this.anims.create({
-        key: 'player_idle',
-        frames: this.anims.generateFrameNumbers('player_idle', { start: 0, end: this.textures.get('player_idle').frameTotal - 1 }),
-        frameRate: 8,
-        repeat: -1
-      });
-    } else {
-      this.anims.create({
-        key: 'player_idle',
-        frames: [{ key: 'player_idle', frame: 0 }],
-        frameRate: 8,
-        repeat: -1
-      });
-    }
+    this.createPlayerAnimation(
+      'player_idle',
+      'player_idle',
+      20,
+      -1
+    );
 
-    if (this.textures.exists('player_jump') && this.textures.get('player_jump').frameTotal > 1) {
-      this.anims.create({
-        key: 'player_jump',
-        frames: this.anims.generateFrameNumbers('player_jump', { start: 0, end: this.textures.get('player_jump').frameTotal - 1 }),
-        frameRate: 12,
-        repeat: 0
-      });
-    } else {
-      this.anims.create({
-        key: 'player_jump',
-        frames: [{ key: 'player_jump', frame: 0 }],
-        frameRate: 12,
-        repeat: 0
-      });
-    }
+    this.createPlayerAnimation(
+      'player_jump',
+      'player_jump',
+      8,
+      0
+    );
 
-    if (this.textures.exists('player_run') && this.textures.get('player_run').frameTotal > 1) {
+    this.createPlayerAnimation(
+      'player_run',
+      'player_run',
+      20,
+      -1
+    );
+
+    this.createPlayerAnimation(
+      'player_fall',
+      'player_jump',
+      8,
+      -1,
+      true
+    );
+  }
+
+  private createPlayerAnimation(
+    animKey: string,
+    textureKey: string,
+    frameRate: number,
+    repeat: number,
+    useLastFrame: boolean = false
+  ) {
+    if (this.textures.exists(textureKey) && this.textures.get(textureKey).frameTotal > 1) {
+      let frames;
+      if (useLastFrame) {
+        const lastFrame = Math.max(0, this.textures.get(textureKey).frameTotal - 1);
+        frames = this.anims.generateFrameNumbers(textureKey, { start: lastFrame, end: lastFrame });
+      } else {
+        frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
+      }
+
       this.anims.create({
-        key: 'player_run',
-        frames: this.anims.generateFrameNumbers('player_run', { start: 0, end: this.textures.get('player_run').frameTotal - 1 }),
-        frameRate: 12,
-        repeat: -1
+        key: animKey,
+        frames: frames,
+        frameRate: frameRate,
+        repeat: repeat
       });
     } else {
       this.anims.create({
-        key: 'player_run',
-        frames: [{ key: 'player_run', frame: 0 }],
-        frameRate: 12,
-        repeat: -1
+        key: animKey,
+        frames: [{ key: textureKey, frame: 0 }],
+        frameRate: frameRate,
+        repeat: repeat
       });
     }
   }
