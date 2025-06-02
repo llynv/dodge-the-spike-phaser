@@ -119,12 +119,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   override update(time: number, delta: number) {
-    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
-      return;
-    }
-
-    this.timeElapsed += delta / 1000;
-    this.updateTimerDisplay();
+    this.updateTimer(time, delta);
 
     this.player.update(time, delta);
 
@@ -133,6 +128,14 @@ export class GameScene extends Phaser.Scene {
     if (GameManager.getInstance().getIsGameOver() && !this.gameOverUI.visible) {
       this.showGameOver();
     }
+  }
+
+  private updateTimer(time: number, delta: number): void {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
+      return;
+    }
+    this.timeElapsed += delta / 1000;
+    this.updateTimerDisplay();
   }
 
   private createBackground(): void {
@@ -176,13 +179,11 @@ export class GameScene extends Phaser.Scene {
   private createGround(): void {
     this.platforms = this.physics.add.staticGroup();
     const groundSprite = this.add.sprite(0, 0, 'ground');
-    // groundSprite.setOrigin(0.5, 0.5);
     groundSprite.setDisplaySize(this.scale.width, 200);
     groundSprite.setPosition(this.scale.width / 2, this.scale.height - 50);
     groundSprite.setSize(this.scale.width, 200);
     this.physics.add.existing(groundSprite, true);
     this.platforms.add(groundSprite);
-    // this.physics.add.collider(this.player, this.platforms);
   }
 
   private createPlayer(): void {
@@ -280,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     this.pauseMenu = this.add.container(this.scale.width / 2, this.scale.height / 2);
 
     const resumeButton = this.createMenuButton(
-      0, -this.MENU_BUTTONS.RESUME.HEIGHT - 35,
+      0, -this.MENU_BUTTONS.RESUME.HEIGHT - 90,
       this.MENU_BUTTONS.RESUME.TEXT,
       this.MENU_BUTTONS.RESUME,
       () => GameManager.getInstance().setIsPaused(false)

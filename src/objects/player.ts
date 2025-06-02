@@ -76,6 +76,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   public override update(time: number, delta: number): void {
     if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
+      this.stop();
       return;
     }
 
