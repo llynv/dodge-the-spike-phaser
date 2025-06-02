@@ -1,0 +1,28 @@
+{
+  "name": "dodge-the-spike-phaser",
+  "version": "1.0.0",
+  "description": "A Phaser.js game project with TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch & npx http-server . -p 8080 -o -c-1",
+    "start": "npm run build && npx http-server . -p 8080 -o",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "phaser",
+    "game",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^3.70.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.0",
+    "typescript": "^5.1.6",
+    "http-server": "^14.1.1",
+    "rimraf": "^5.0.1"
+  }
+}
