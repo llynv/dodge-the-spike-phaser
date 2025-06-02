@@ -1,38 +1,101 @@
 body {
   margin: 0;
-  padding: 20px;
+  padding: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Arial', sans-serif;
+  background-attachment: fixed;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  animation: backgroundShift 10s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundShift {
+  0% {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  100% {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
 }
 
 #game-container {
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  padding: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 2px 16px rgba(255, 255, 255, 0.1) inset;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  max-height: 95vh;
+  max-width: 95vw;
+}
+
+#game-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
+  pointer-events: none;
 }
 
 h1 {
   color: white;
-  margin: 0 0 20px 0;
-  font-size: 2.5em;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0 0 15px 0;
+  font-size: 2.2em;
+  font-weight: 300;
+  text-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.2);
+  letter-spacing: 1px;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+  min-width: 360px;
+  min-height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes titleGlow {
+  0% {
+    text-shadow:
+      2px 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  100% {
+    text-shadow:
+      2px 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(255, 255, 255, 0.4);
+  }
 }
 
 #phaser-game {
-  border-radius: 10px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 6px 25px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 canvas {
   display: block;
   margin: 0 auto;
+  border-radius: 15px;
+  max-height: 90vh;
+  max-width: 90vw;
 }

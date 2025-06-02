@@ -1,18 +1,19 @@
 {
   "name": "dodge-the-spike-phaser",
   "version": "1.0.0",
-  "description": "A Phaser.js game project with TypeScript",
-  "main": "dist/index.js",
+  "description": "A Phaser.js game project with TypeScript and Webpack",
+  "main": "dist/main.js",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch & npx http-server . -p 8080 -o -c-1",
-    "start": "npm run build && npx http-server . -p 8080 -o",
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development",
+    "start": "npm run build && npx http-server dist -p 8080 -o",
     "clean": "rimraf dist"
   },
   "keywords": [
     "phaser",
     "game",
-    "typescript"
+    "typescript",
+    "webpack"
   ],
   "author": "",
   "license": "MIT",
@@ -22,6 +23,14 @@
   "devDependencies": {
     "@types/node": "^20.5.0",
     "typescript": "^5.1.6",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0",
+    "ts-loader": "^9.4.0",
+    "css-loader": "^6.8.0",
+    "style-loader": "^3.3.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "html-webpack-plugin": "^5.5.0",
     "http-server": "^14.1.1",
     "rimraf": "^5.0.1"
   }
