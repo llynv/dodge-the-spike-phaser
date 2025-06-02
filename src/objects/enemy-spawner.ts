@@ -46,7 +46,7 @@ export class EnemySpawner {
   }
 
   public update(time: number, delta: number): void {
-    if (GameManager.instance.isPaused || GameManager.instance.isGameOver) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
     this.updateEnemies(time, delta);

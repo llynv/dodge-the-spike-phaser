@@ -80,12 +80,10 @@ export class GameScene extends Phaser.Scene {
   private pauseBackground!: Phaser.GameObjects.Rectangle;
   private gameOverUI!: Phaser.GameObjects.Container;
 
-  // Background system
   private background!: Phaser.GameObjects.Image;
   private backgroundIndex: number = 2;
   private backgroundInterval!: Phaser.Time.TimerEvent;
 
-  // Game state
   private timeElapsed: number = 0;
   private isPaused: boolean = false;
 
@@ -94,59 +92,45 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Initialize game manager
-    GameManager.instance.reset();
+    GameManager.getInstance().reset();
 
-    // Create background
     this.createBackground();
 
-    // Create ground/platforms
     this.createGround();
 
-    // Create player
     this.createPlayer();
 
-    // Create enemy spawner
     this.createEnemySpawner();
 
-    // Create UI
     this.createTimer();
     this.createOptionsButton();
     this.createPauseMenu();
     this.createGameOverUI();
 
-    // Set up physics collisions
     this.setupCollisions();
 
-    // Set up pause/resume callbacks
     this.setupPauseCallbacks();
 
-    // Handle window blur (matching original)
     this.game.events.on('blur', () => {
-      if (!GameManager.instance.isGameOver) {
-        GameManager.instance.pause();
+      if (!GameManager.getInstance().getIsGameOver()) {
+        GameManager.getInstance().pause();
       }
     });
   }
 
   override update(time: number, delta: number) {
-    if (GameManager.instance.isPaused || GameManager.instance.isGameOver) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
 
-    // Update timer
     this.timeElapsed += delta / 1000;
-    GameManager.instance.setElapsedTime(this.timeElapsed); // TODO: Remove this
     this.updateTimerDisplay();
 
-    // Update player
     this.player.update(time, delta);
 
-    // Update enemy spawner
     this.enemySpawner.update(time, delta);
 
-    // Check for game over
-    if (GameManager.instance.isGameOver && !this.gameOverUI.visible) {
+    if (GameManager.getInstance().getIsGameOver() && !this.gameOverUI.visible) {
       this.showGameOver();
     }
   }
@@ -156,7 +140,6 @@ export class GameScene extends Phaser.Scene {
     this.background.setOrigin(0, 0);
     this.background.setDisplaySize(this.scale.width, this.scale.height);
 
-    // Start background change timer (matching original logic)
     this.backgroundInterval = this.time.addEvent({
       delay: this.BACKGROUND_CHANGE_INTERVAL,
       callback: this.changeBackground,
@@ -166,15 +149,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private changeBackground(): void {
-    if (GameManager.instance.isGameOver || GameManager.instance.isPaused) return;
+    if (GameManager.getInstance().getIsGameOver() || GameManager.getInstance().getIsPaused()) return;
 
     const changeIndexState = (idx: number) => 3 - idx;
 
-    // Get next background
     const nextBgKey = `background0${this.backgroundIndex}`;
     this.backgroundIndex = changeIndexState(this.backgroundIndex);
 
-    // Create fade effect (simplified version of original)
     this.tweens.add({
       targets: this.background,
       alpha: 0,
@@ -195,7 +176,6 @@ export class GameScene extends Phaser.Scene {
   private createGround(): void {
     this.platforms = this.physics.add.staticGroup();
 
-    // Create ground platform
     const ground = this.add.rectangle(
       this.scale.width / 2,
       this.scale.height - 50,
@@ -205,7 +185,6 @@ export class GameScene extends Phaser.Scene {
     );
     ground.setOrigin(0.5, 0.5);
 
-    // Add physics body
     this.physics.add.existing(ground, true);
     this.platforms.add(ground);
   }
@@ -285,14 +264,13 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.optionsButton.on('pointerdown', () => {
-      if (!GameManager.instance.isGameOver) {
-        GameManager.instance.setIsPaused(true);
+      if (!GameManager.getInstance().getIsGameOver()) {
+        GameManager.getInstance().setIsPaused(true);
       }
     });
   }
 
   private createPauseMenu(): void {
-    // Create pause background
     this.pauseBackground = this.add.rectangle(
       this.scale.width / 2,
       this.scale.height / 2,
@@ -303,18 +281,15 @@ export class GameScene extends Phaser.Scene {
     );
     this.pauseBackground.setVisible(false);
 
-    // Create pause menu container
     this.pauseMenu = this.add.container(this.scale.width / 2, this.scale.height / 2);
 
-    // Resume button
     const resumeButton = this.createMenuButton(
       0, -this.MENU_BUTTONS.RESUME.HEIGHT - 35,
       this.MENU_BUTTONS.RESUME.TEXT,
       this.MENU_BUTTONS.RESUME,
-      () => GameManager.instance.setIsPaused(false)
+      () => GameManager.getInstance().setIsPaused(false)
     );
 
-    // Restart button
     const restartButton = this.createMenuButton(
       0, this.MENU_BUTTONS.RESTART.HEIGHT / 2,
       this.MENU_BUTTONS.RESTART.TEXT,
@@ -322,7 +297,6 @@ export class GameScene extends Phaser.Scene {
       () => this.scene.start('GameScene')
     );
 
-    // Back button
     const backButton = this.createMenuButton(
       0, -this.MENU_BUTTONS.BACK.HEIGHT,
       this.MENU_BUTTONS.BACK.TEXT,
@@ -370,14 +344,11 @@ export class GameScene extends Phaser.Scene {
   private createGameOverUI(): void {
     this.gameOverUI = this.add.container(this.scale.width / 2, this.scale.height / 2);
 
-    // Background
     const bg = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000, 0.8);
 
-    // Popup background
     const popup = this.add.rectangle(0, 0, 600, 400, 0x2c3e50);
     popup.setStrokeStyle(3, 0x34495e);
 
-    // Title
     const title = this.add.text(0, -100, 'GAME OVER', {
       fontSize: '32px',
       color: '#e74c3c',
@@ -394,25 +365,22 @@ export class GameScene extends Phaser.Scene {
       }
     }).setOrigin(0.5);
 
-    // Score text (will be updated)
     const scoreText = this.add.text(0, -50, '', {
       fontSize: '24px',
       color: '#ecf0f1',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    // Restart button
     const restartBtn = this.createMenuButton(
       -75, 50,
       'Restart',
       { WIDTH: 150, HEIGHT: 60, BACKGROUND_COLOR: '#3498db', HOVER_COLOR: '#2980b9', TEXT_COLOR: '#ffffff' },
       () => {
-        GameManager.instance.reset();
+        GameManager.getInstance().reset();
         this.scene.start('GameScene');
       }
     );
 
-    // High scores button
     const highScoreBtn = this.createMenuButton(
       75, 50,
       'High Scores',
@@ -425,16 +393,13 @@ export class GameScene extends Phaser.Scene {
     this.gameOverUI.add([bg, popup, title, scoreText, restartBtn, highScoreBtn]);
     this.gameOverUI.setVisible(false);
 
-    // Store score text for updates
     (this.gameOverUI as any).scoreText = scoreText;
   }
 
   private showGameOver(): void {
-    // Update score display
     const scoreText = (this.gameOverUI as any).scoreText;
     scoreText.setText(`Your Score: ${Math.floor(this.timeElapsed)} points`);
 
-    // Save high score
     const currentScore = Math.floor(this.timeElapsed);
     const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
     if (currentScore > bestScore) {
@@ -453,21 +418,20 @@ export class GameScene extends Phaser.Scene {
 
       const died = playerSprite.takeDamage(enemySprite.getDamage());
       if (!died) {
-        // Remove enemy on hit if player doesn't die
         enemySprite.destroy();
       }
     });
   }
 
   private setupPauseCallbacks(): void {
-    GameManager.instance.addPauseCallback(() => {
+    GameManager.getInstance().addPauseCallback(() => {
       this.pauseBackground.setVisible(true);
       this.pauseMenu.setVisible(true);
       this.physics.pause();
       this.backgroundInterval.paused = true;
     });
 
-    GameManager.instance.addResumeCallback(() => {
+    GameManager.getInstance().addResumeCallback(() => {
       this.pauseBackground.setVisible(false);
       this.pauseMenu.setVisible(false);
       this.physics.resume();

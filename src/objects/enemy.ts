@@ -73,7 +73,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override update(time: number, delta: number): void {
-    if (GameManager.instance.isPaused || GameManager.instance.isGameOver) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
     const direction = this.getDirection();

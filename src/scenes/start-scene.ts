@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
 
 export class StartScene extends Phaser.Scene {
-  // Configuration constants (identical to original)
   private readonly TITLE = {
     WIDTH: 400,
     HEIGHT: 100,
-    X_OFFSET: 200, // Half of width for centering
+    X_OFFSET: 200,
     Y_POSITION: 100,
     FONT_SIZE: 40,
     FONT_FAMILY: 'Arial',
@@ -15,8 +14,8 @@ export class StartScene extends Phaser.Scene {
   private readonly START_BUTTON = {
     WIDTH: 300,
     HEIGHT: 80,
-    X_OFFSET: 150, // Half of width for centering
-    Y_OFFSET: 0, // Relative to center
+    X_OFFSET: 150,
+    Y_OFFSET: 0,
     TEXT: 'START GAME',
     NORMAL_COLOR: '#4CAF50',
     HOVER_COLOR: '#45a049',
@@ -26,16 +25,16 @@ export class StartScene extends Phaser.Scene {
   private readonly HIGH_SCORES_BUTTON = {
     WIDTH: 300,
     HEIGHT: 80,
-    X_OFFSET: 150, // Half of width for centering
-    Y_OFFSET: 100, // Relative to center
+    X_OFFSET: 150,
+    Y_OFFSET: 100,
     TEXT: 'HIGH SCORES'
   };
 
   private readonly CREDITS = {
     WIDTH: 300,
     HEIGHT: 30,
-    X_OFFSET: 150, // Half of width for centering
-    Y_OFFSET: 40, // From bottom
+    X_OFFSET: 150,
+    Y_OFFSET: 40,
     FONT_SIZE: 14,
     FONT_FAMILY: 'Arial',
     TEXT: '© 2025 Dodge The Spike',
@@ -61,8 +60,7 @@ export class StartScene extends Phaser.Scene {
   }
 
   private createBackground(): void {
-    // Try to use menu_background first, then background01 as fallback (matching original)
-    let backgroundKey = 'background01'; // Default fallback
+    let backgroundKey = 'background01';
 
     if (this.textures.exists('menu_background')) {
       backgroundKey = 'menu_background';
@@ -74,38 +72,27 @@ export class StartScene extends Phaser.Scene {
   }
 
   private createTitle(): void {
-    // Try to use title sprite first, then create fallback text (matching original)
-    if (this.textures.exists('titles')) {
-      const titleSprite = this.add.image(
-        this.scale.width / 2,
-        this.TITLE.Y_POSITION + this.TITLE.HEIGHT / 2,
-        'titles'
-      );
-      titleSprite.setDisplaySize(this.TITLE.WIDTH, this.TITLE.HEIGHT);
-    } else {
-      // Fallback text (matching original fallback logic)
-      this.add.text(
-        this.scale.width / 2,
-        this.TITLE.Y_POSITION + this.TITLE.HEIGHT / 2,
-        this.TITLE.TEXT,
-        {
-          fontSize: `${this.TITLE.FONT_SIZE}px`,
-          color: this.COLORS.WHITE,
-          fontFamily: this.TITLE.FONT_FAMILY,
-          fontStyle: 'bold',
-          stroke: 'rgba(0, 0, 0, 0.8)',
-          strokeThickness: 3,
-          shadow: {
-            offsetX: 2,
-            offsetY: 2,
-            color: 'rgba(0, 0, 0, 0.8)',
-            blur: 4,
-            stroke: true,
-            fill: true
-          }
+    this.add.text(
+      this.scale.width / 2,
+      this.TITLE.Y_POSITION + this.TITLE.HEIGHT / 2,
+      this.TITLE.TEXT,
+      {
+        fontSize: `${this.TITLE.FONT_SIZE}px`,
+        color: this.COLORS.WHITE,
+        fontFamily: this.TITLE.FONT_FAMILY,
+        fontStyle: 'bold',
+        stroke: 'rgba(0, 0, 0, 0.8)',
+        strokeThickness: 3,
+        shadow: {
+          offsetX: 2,
+          offsetY: 2,
+          color: 'rgba(0, 0, 0, 0.8)',
+          blur: 4,
+          stroke: true,
+          fill: true
         }
-      ).setOrigin(0.5);
-    }
+      }
+    ).setOrigin(0.5);
   }
 
   private createStartButton(): void {
@@ -195,10 +182,8 @@ export class StartScene extends Phaser.Scene {
   }
 
   private createCreditsText(): void {
-    // Create credits text with background (matching original)
     const creditsY = this.scale.height - this.CREDITS.Y_OFFSET;
 
-    // Background rectangle
     this.add.rectangle(
       this.scale.width / 2,
       creditsY,
@@ -208,7 +193,6 @@ export class StartScene extends Phaser.Scene {
       this.CREDITS.BACKGROUND_ALPHA
     );
 
-    // Credits text
     this.add.text(
       this.scale.width / 2,
       creditsY,

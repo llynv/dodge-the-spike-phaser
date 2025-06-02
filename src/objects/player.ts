@@ -80,11 +80,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override update(time: number, delta: number): void {
-    if (GameManager.instance.isPaused || GameManager.instance.isGameOver) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
 
-    const deltaTime = delta / 1000; // Convert to seconds
+    const deltaTime = delta / 1000;
 
     this.handleMovement(deltaTime);
     this.handleJump();
@@ -96,10 +96,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private handleMovement(deltaTime: number): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
 
-    // Reset movement direction
     this.moveDir = 0;
 
-    // Check input (matching original key bindings)
     if (this.cursors.left?.isDown || this.wasdKeys.left?.isDown) {
       this.moveDir = -1;
       this.isReversed = true;
@@ -108,19 +106,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.isReversed = false;
     }
 
-    // Apply movement (matching original acceleration logic)
     if (this.moveDir !== 0) {
       const acceleration = this.moveDir * this.PLAYER_CONFIG.PHYSICS.MOVE_ACCELERATION * deltaTime;
       body.setVelocityX(body.velocity.x + acceleration);
 
-      // Limit to max speed
       const limitedSpeed = Math.min(
         Math.abs(body.velocity.x),
         this.PLAYER_CONFIG.PHYSICS.MAX_MOVE_SPEED
       );
       body.setVelocityX(limitedSpeed * Math.sign(body.velocity.x));
     } else {
-      // Apply friction when not moving
       body.setVelocityX(body.velocity.x * 0.8);
     }
   }
@@ -128,7 +123,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private handleJump(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
 
-    // Check jump input (matching original - ArrowUp key)
     const jumpPressed = this.cursors.up?.isDown || this.wasdKeys.up?.isDown || this.spaceKey?.isDown;
 
     if (jumpPressed && body.touching.down) {
@@ -141,7 +135,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const velocity = { x: body.velocity.x, y: body.velocity.y };
     const isJumping = !body.touching.down;
 
-    // State logic matching original PlayerStateManager
     if (isJumping) {
       if (velocity.y < 0) {
         this.currentState = PlayerState.JUMPING;
@@ -160,7 +153,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private updateAnimations(): void {
     this.setFlipX(this.isReversed);
 
-    // Map player states to correct animation keys
     let animKey: string;
     switch (this.currentState) {
       case PlayerState.IDLE:
@@ -199,7 +191,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (this.isInvulnerable) {
       this.invulnerabilityTimer -= deltaTime * 1000;
 
-      const flashSpeed = 100; // milliseconds
+      const flashSpeed = 100;
       const visible = Math.floor(this.invulnerabilityTimer / flashSpeed) % 2 === 0;
       this.setVisible(visible);
 
@@ -211,7 +203,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   public takeDamage(damage: number): boolean {
-    if (this.isInvulnerable || GameManager.instance.isGameOver) {
+    if (this.isInvulnerable || GameManager.getInstance().getIsGameOver()) {
       return false;
     }
 
@@ -230,7 +222,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   private die(): void {
-    GameManager.instance.setIsGameOver(true);
+    GameManager.getInstance().setIsGameOver(true);
   }
 
   public getVelocity(): { x: number; y: number } {

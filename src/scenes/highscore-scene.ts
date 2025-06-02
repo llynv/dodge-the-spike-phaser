@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 
 export class HighScoreScene extends Phaser.Scene {
-  // Configuration constants matching original
   private readonly TITLE = {
     Y_POSITION: 100,
     FONT_SIZE: 40,
@@ -37,7 +36,6 @@ export class HighScoreScene extends Phaser.Scene {
   }
 
   private createBackground(): void {
-    // Use background01 as fallback like original
     const background = this.add.image(0, 0, 'background01');
     background.setOrigin(0, 0);
     background.setDisplaySize(this.scale.width, this.scale.height);
@@ -62,10 +60,8 @@ export class HighScoreScene extends Phaser.Scene {
   }
 
   private createScoreList(): void {
-    // Get best score from localStorage (matching original)
     const bestScore = localStorage.getItem('bestScore') || '0';
 
-    // Create score entries (simplified version of original high score system)
     const scores = [
       { score: parseInt(bestScore), name: 'You' },
       { score: 0, name: 'No Score' },
@@ -80,7 +76,6 @@ export class HighScoreScene extends Phaser.Scene {
     scores.forEach((entry, index) => {
       const y = startY + (index * spacing);
 
-      // Rank
       const rank = index + 1;
       const rankColor = this.getRankColor(rank);
 
@@ -90,21 +85,18 @@ export class HighScoreScene extends Phaser.Scene {
         fontStyle: 'bold'
       }).setOrigin(0, 0.5);
 
-      // Score
       this.add.text(this.scale.width / 2, y, `${entry.score} points`, {
         fontSize: '24px',
         color: this.COLORS.WHITE,
         fontStyle: 'bold'
       }).setOrigin(0.5, 0.5);
 
-      // Name/Label
       this.add.text(570, y, entry.name, {
         fontSize: '18px',
         color: '#cccccc'
       }).setOrigin(1, 0.5);
     });
 
-    // Instructions
     this.add.text(this.scale.width / 2, 700, 'Play more games to improve your high score!', {
       fontSize: '18px',
       color: '#87CEEB',
