@@ -1,22 +1,26 @@
 import Phaser from 'phaser';
 import '../style.css';
+import { LoadingScene } from './scenes/LoadingScene';
+import { StartScene } from './scenes/StartScene';
 
-// Game configuration
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 720,
+  height: 1280,
   parent: 'phaser-game',
-  backgroundColor: '#2c3e50',
+  backgroundColor: '#87CEEB',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { x: 0, y: 0 },
-      debug: false
+      gravity: { x: 0, y: 1000 },
+      debug: true
     }
   },
-  scene: {
-  }
+  scene: [LoadingScene, StartScene]
 };
 
 const game = new Phaser.Game(config);
