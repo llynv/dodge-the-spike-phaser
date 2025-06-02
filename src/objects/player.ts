@@ -9,7 +9,6 @@ export enum PlayerState {
 }
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
-  // Player configuration constants (identical to original)
   private readonly PLAYER_CONFIG = {
     SCALE: 0.5,
     PHYSICS: {
@@ -21,26 +20,23 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     COLLIDER: {
       WIDTH: 20,
       HEIGHT: 45,
-      OFFSET: { x: 40, y: 45 }
+      OFFSET: { x: 0, y: 0 }
     },
     ANIMATION_FPS: 2,
     HEALTH: {
       MAX: 100,
-      INVULNERABILITY_DURATION: 2000 // 2 seconds
+      INVULNERABILITY_DURATION: 2000
     }
   };
 
-  // Player state
   private currentState: PlayerState = PlayerState.IDLE;
   private isReversed: boolean = false;
   private moveDir: number = 0;
 
-  // Health system
   private health: number = this.PLAYER_CONFIG.HEALTH.MAX;
   private isInvulnerable: boolean = false;
   private invulnerabilityTimer: number = 0;
 
-  // Input handling
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private spaceKey!: Phaser.Input.Keyboard.Key;
   private wasdKeys!: { up: Phaser.Input.Keyboard.Key, left: Phaser.Input.Keyboard.Key, down: Phaser.Input.Keyboard.Key, right: Phaser.Input.Keyboard.Key };
@@ -50,11 +46,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.setScale(this.PLAYER_CONFIG.SCALE);
 
-    // Add to scene
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    // Set up physics body
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setSize(
       this.PLAYER_CONFIG.COLLIDER.WIDTH,
@@ -66,17 +60,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     );
     body.setMass(this.PLAYER_CONFIG.PHYSICS.MASS);
 
-    // Set up input
     this.setupInput(scene);
 
-    // Start with idle animation if available
     this.playAnimationSafe('player_idle');
   }
 
   private setupInput(scene: Phaser.Scene): void {
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.spaceKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.wasdKeys = scene.input.keyboard!.addKeys('W,S,A,D') as any;
+    this.wasdKeys = scene.input.keyboard!.addKeys('W,S,A,D') as {
+      up: Phaser.Input.Keyboard.Key,
+      left: Phaser.Input.Keyboard.Key,
+      down: Phaser.Input.Keyboard.Key,
+      right: Phaser.Input.Keyboard.Key
+    };
   }
 
   public override update(time: number, delta: number): void {

@@ -175,18 +175,14 @@ export class GameScene extends Phaser.Scene {
 
   private createGround(): void {
     this.platforms = this.physics.add.staticGroup();
-
-    const ground = this.add.rectangle(
-      this.scale.width / 2,
-      this.scale.height - 50,
-      this.scale.width,
-      100,
-      0x8B4513
-    );
-    ground.setOrigin(0.5, 0.5);
-
-    this.physics.add.existing(ground, true);
-    this.platforms.add(ground);
+    const groundSprite = this.add.sprite(0, 0, 'ground');
+    groundSprite.setOrigin(0.5, 0.5);
+    groundSprite.setDisplaySize(this.scale.width, 200);
+    groundSprite.setPosition(this.scale.width / 2, this.scale.height - 50);
+    groundSprite.setSize(this.scale.width, 200);
+    this.physics.add.existing(groundSprite, true);
+    this.platforms.add(groundSprite);
+    // this.physics.add.collider(this.player, this.platforms);
   }
 
   private createPlayer(): void {
