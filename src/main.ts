@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import '../style.css';
 
 // Game configuration
 const config: Phaser.Types.Core.GameConfig = {
