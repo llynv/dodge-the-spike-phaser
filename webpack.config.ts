@@ -32,7 +32,15 @@ const config: webpack.Configuration = {
     ]
   },
   devServer: {
-    static: path.join(__dirname, 'dist')
+    static: [
+      {
+        directory: path.join(__dirname, 'dist')
+      },
+      {
+        directory: path.join(__dirname, 'assets'),
+        publicPath: '/assets'
+      }
+    ]
   },
   resolve: {
     extensions: ['.ts', '.js', '.css']
@@ -41,7 +49,7 @@ const config: webpack.Configuration = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'assets',
+          from: path.resolve(__dirname, 'assets'),
           to: 'assets'
         }
       ]
