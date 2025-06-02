@@ -18,9 +18,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       JUMP_IMPULSE: 350
     },
     COLLIDER: {
-      WIDTH: 20,
-      HEIGHT: 45,
-      OFFSET: { x: 0, y: 0 }
+      OFFSET: { x: 0, y: 30 }
     },
     ANIMATION_FPS: 2,
     HEALTH: {
@@ -42,7 +40,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private wasdKeys!: { up: Phaser.Input.Keyboard.Key, left: Phaser.Input.Keyboard.Key, down: Phaser.Input.Keyboard.Key, right: Phaser.Input.Keyboard.Key };
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'player_idle_fallback');
+    super(scene, x, y, 'player_idle');
 
     this.setScale(this.PLAYER_CONFIG.SCALE);
 
@@ -51,8 +49,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setSize(
-      this.PLAYER_CONFIG.COLLIDER.WIDTH,
-      this.PLAYER_CONFIG.COLLIDER.HEIGHT
+      this.width,
+      this.height - this.PLAYER_CONFIG.COLLIDER.OFFSET.y
     );
     body.setOffset(
       this.PLAYER_CONFIG.COLLIDER.OFFSET.x,
@@ -122,7 +120,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const jumpPressed = this.cursors.up?.isDown || this.wasdKeys.up?.isDown || this.spaceKey?.isDown;
 
-    if (jumpPressed && body.touching.down) {
+    if (jumpPressed) {
       body.setVelocityY(-this.PLAYER_CONFIG.PHYSICS.JUMP_IMPULSE);
     }
   }
@@ -174,7 +172,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private playAnimationSafe(animKey: string): void {
     if (this.scene.anims.exists(animKey)) {
       if (this.anims.currentAnim?.key !== animKey) {
-        console.log('Playing animation', animKey);
         this.play(animKey);
       }
     } else {

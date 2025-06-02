@@ -88,7 +88,7 @@ export class LoadingScene extends Phaser.Scene {
       'player_jump',
       'player_jump',
       8,
-      0
+      -1,
     );
 
     this.createPlayerAnimation(
