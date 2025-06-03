@@ -19,26 +19,32 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createLoadingUI() {
-    this.add.rectangle(360, 640, 720, 1280, 0x2c3e50);
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+    const screenWidth = this.cameras.main.width;
+    const screenHeight = this.cameras.main.height;
 
-    this.add.text(360, 400, 'DODGE THE SPIKE', {
+    this.add.rectangle(centerX, centerY, screenWidth, screenHeight, 0x2c3e50);
+
+    this.add.text(centerX, screenHeight * 0.3, 'DODGE THE SPIKE', {
       fontSize: '48px',
       color: '#ffffff',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(360, 470, 'Loading...', {
+    this.add.text(centerX, screenHeight * 0.4, 'Loading...', {
       fontSize: '24px',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    const loadingBarBg = this.add.rectangle(360, 640, 400, 30, 0x34495e);
+    const loadingBarWidth = Math.min(400, screenWidth * 0.6);
+    const loadingBarBg = this.add.rectangle(centerX, centerY, loadingBarWidth, 30, 0x34495e);
     loadingBarBg.setStrokeStyle(2, 0xffffff);
 
-    const loadingBar = this.add.rectangle(360, 640, 396, 26, 0x3498db);
+    const loadingBar = this.add.rectangle(centerX, centerY, loadingBarWidth - 4, 26, 0x3498db);
     loadingBar.scaleX = 0;
 
-    const loadingText = this.add.text(360, 700, 'Loading Assets... 0%', {
+    const loadingText = this.add.text(centerX, screenHeight * 0.6, 'Loading Assets... 0%', {
       fontSize: '18px',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -70,6 +76,10 @@ export class LoadingScene extends Phaser.Scene {
       frameWidth: 155,
       frameHeight: 280
     });
+    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/enemy_fire.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
 
     this.load.on('loaderror', (file: any) => {
       console.warn(`Failed to load asset: ${file.key} from ${file.url}`);
@@ -77,51 +87,68 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createAnimations() {
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_idle',
       'player_idle',
       20,
       -1
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_jump',
       'player_jump',
       8,
       -1,
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_run',
       'player_run',
       20,
       -1
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_fall',
       'player_jump',
       8,
       -1,
       true
     );
+
+    this.createAnimation(
+      'enemy_fire',
+      'enemy_fire',
+      12,
+      -1,
+      false,
+      8
+    );
   }
 
-  private createPlayerAnimation(
+  private createAnimation(
     animKey: string,
     textureKey: string,
     frameRate: number,
     repeat: number,
-    useLastFrame: boolean = false
+    useLastFrame: boolean = false,
+    useLastNFrames?: number
   ) {
     if (this.textures.exists(textureKey) && this.textures.get(textureKey).frameTotal > 1) {
       let frames;
       if (useLastFrame) {
         const lastFrame = Math.max(0, this.textures.get(textureKey).frameTotal - 1);
         frames = this.anims.generateFrameNumbers(textureKey, { start: lastFrame, end: lastFrame });
+      } else if (useLastNFrames) {
+        const totalFrames = this.textures.get(textureKey).frameTotal - 1;
+        const startFrame = Math.max(0, totalFrames - useLastNFrames);
+        const endFrame = totalFrames - 1;
+        frames = this.anims.generateFrameNumbers(textureKey, { start: startFrame, end: endFrame });
       } else {
         frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
       }
+
+      console.log(`Creating animation ${animKey} with ${frames.length} frames`);
 
       this.anims.create({
         key: animKey,

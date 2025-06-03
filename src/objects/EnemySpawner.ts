@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { Enemy, EnemyType, SpawnDirection } from './enemy';
-import { GameManager } from '../managers/game-manager';
-import { Player } from './player';
+import { Enemy, EnemyType, SpawnDirection } from './Enemy';
+import { GameManager } from '../managers/GameManager';
+import { Player } from './Player';
 import { Vec2 } from '../utils/math/vec2';
-import { MathUtils } from '../utils/math/math-utils';
+import { MathUtils } from '../utils/math/mathUtils';
 
 export class EnemySpawner {
   private scene: Phaser.Scene;
@@ -23,17 +23,9 @@ export class EnemySpawner {
     [EnemyType.FAST]: 20,
     [EnemyType.TANK]: 10
   };
-  private enemyColors: Record<EnemyType, string> = {
-    [EnemyType.BASIC]: 'red',
-    [EnemyType.FAST]: 'blue',
-    [EnemyType.TANK]: 'green'
-  };
 
   private currentSpawnRate: number;
-  private lastSpawnTime: number = 0;
-  private lastDifficultyIncrease: number = 0;
   private spawnTimer: number = 0;
-  private enemySize: { width: number, height: number } = { width: 0, height: 0 };
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -95,18 +87,18 @@ export class EnemySpawner {
 
     switch (direction) {
       case SpawnDirection.LEFT:
-        enemy.x = -this.enemySize.width;
-        enemy.y = MathUtils.random(this.enemySize.height, screenHeight - this.enemySize.height);
+        enemy.x = -enemy.width;
+        enemy.y = MathUtils.random(enemy.height, screenHeight - enemy.height);
         break;
 
       case SpawnDirection.RIGHT:
-        enemy.x = screenWidth + this.enemySize.width;
-        enemy.y = MathUtils.random(this.enemySize.height, screenHeight - this.enemySize.height);
+        enemy.x = screenWidth + enemy.width;
+        enemy.y = MathUtils.random(enemy.height, screenHeight - enemy.height);
         break;
 
       case SpawnDirection.TOP:
-        enemy.x = MathUtils.random(this.enemySize.width, screenWidth - this.enemySize.width);
-        enemy.y = -this.enemySize.height;
+        enemy.x = MathUtils.random(enemy.width, screenWidth - enemy.width);
+        enemy.y = -enemy.height;
         break;
     }
   }
@@ -139,10 +131,6 @@ export class EnemySpawner {
     }
 
     return EnemyType.BASIC;
-  }
-
-  public setEnemySize(width: number, height: number): void {
-    this.enemySize = { width, height };
   }
 
   public getEnemies(): Phaser.GameObjects.Group {

@@ -57,7 +57,7 @@ export class GameManager {
     }
   }
 
-  public pause(): void {
+  private pause(): void {
     if (!this.isPaused && !this.isGameOver) {
       this.isPaused = true;
       this.pauseTime = Date.now();
@@ -66,7 +66,7 @@ export class GameManager {
     }
   }
 
-  public resume(): void {
+  private resume(): void {
     if (this.isPaused && !this.isGameOver) {
       this.isPaused = false;
 

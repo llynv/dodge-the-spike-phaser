@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameManager } from '../managers/game-manager';
+import { GameManager } from '../managers/GameManager';
 import { Vec2 } from '../utils/math/vec2';
 
 export enum SpawnDirection {
@@ -40,6 +40,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   };
 
   private enemyType: EnemyType;
+  private spawnDirection: SpawnDirection;
   private moveSpeed: number = 0;
   private damageValue: number = 0;
   private targetX: number = 0;
@@ -49,39 +50,60 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number, type: EnemyType, spawnDirection: SpawnDirection) {
     super(scene, x, y, 'enemy');
 
+    this.play('enemy_fire');
+
     this.enemyType = type;
+    this.spawnDirection = spawnDirection;
     this.setupEnemyConfig();
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setCircle(16);
 
     body.setGravityY(0);
     body.setCollideWorldBounds(false);
     body.setBounce(0, 0);
+
+    this.setupEnemyConfig();
   }
 
   private setupEnemyConfig(): void {
     const config = this.CONFIG[this.enemyType.toUpperCase() as keyof typeof this.CONFIG];
 
     this.setScale(config.SCALE);
-    this.setTint(config.COLOR);
+
+    this.body?.setSize(this.width / 2, this.height / 2);
+    this.body?.setOffset(this.width / 4, this.height / 4);
+
     this.moveSpeed = config.SPEED;
     this.damageValue = config.DAMAGE;
+  }
+
+  private handleSpriteOrientation(): void {
+    if (this.spawnDirection === SpawnDirection.RIGHT || (this.spawnDirection === SpawnDirection.TOP && this.x > this.targetX)) {
+      this.setFlipY(true);
+    } else {
+      this.setFlipY(false);
+    }
   }
 
   public override update(time: number, delta: number): void {
     if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
+
     const direction = this.getDirection();
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
+    this.body?.velocity.set(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
+
+    this.rotation = Math.atan2(
+      this.body?.velocity.y ?? 0,
+      this.body?.velocity.x ?? 0
+    );
 
     this.checkBounds();
   }
+
 
   private checkBounds(): void {
     const buffer = 200;
@@ -105,6 +127,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public setTargetPosition(x: number, y: number): void {
     this.targetX = x;
     this.targetY = y;
+
+    this.handleSpriteOrientation();
   }
 
   private getDirection(): Vec2 {
