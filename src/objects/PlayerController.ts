@@ -36,7 +36,12 @@ export class PlayerController {
   private setupInput(scene: Phaser.Scene): void {
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.spaceKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.wasdKeys = scene.input.keyboard!.addKeys('W,S,A,D') as any;
+    this.wasdKeys = scene.input.keyboard!.addKeys('W,S,A,D') as {
+      up: Phaser.Input.Keyboard.Key,
+      down: Phaser.Input.Keyboard.Key,
+      left: Phaser.Input.Keyboard.Key,
+      right: Phaser.Input.Keyboard.Key
+    };
   }
 
   public update(deltaTime: number): void {
