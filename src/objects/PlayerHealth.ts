@@ -46,8 +46,8 @@ export class PlayerHealth {
       return true;
     }
 
+    this.invulnerabilityTimer = (!this.isInvulnerable) ? this.INVULNERABILITY_DURATION : 0;
     this.isInvulnerable = true;
-    this.invulnerabilityTimer = this.INVULNERABILITY_DURATION;
 
     return false;
   }
