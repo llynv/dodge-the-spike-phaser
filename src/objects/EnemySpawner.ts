@@ -4,10 +4,11 @@ import { GameManager } from '../managers/GameManager';
 import { Player } from './Player';
 import { Vec2 } from '../utils/math/vec2';
 import { MathUtils } from '../utils/math/mathUtils';
+import { EnemyPool } from './EnemyPool';
 
 export class EnemySpawner {
   private scene: Phaser.Scene;
-  private enemies: Phaser.GameObjects.Group;
+  private enemyPool: EnemyPool;
   private player: Player | undefined;
 
   private readonly CONFIG = {
@@ -29,7 +30,7 @@ export class EnemySpawner {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.enemies = scene.add.group();
+    this.enemyPool = new EnemyPool(scene);
     this.currentSpawnRate = this.CONFIG.INITIAL_SPAWN_RATE;
   }
 
@@ -41,6 +42,7 @@ export class EnemySpawner {
     if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
+
     this.updateEnemies(time, delta);
 
     this.spawnTimer += delta;
@@ -55,10 +57,9 @@ export class EnemySpawner {
   }
 
   private updateEnemies(time: number, delta: number): void {
-    this.enemies.children.entries.forEach(enemy => {
-      if (enemy instanceof Enemy) {
-        enemy.update(time, delta);
-      }
+    const activeEnemies = this.enemyPool.getActiveEnemies();
+    activeEnemies.forEach(enemy => {
+      enemy.update(time, delta);
     });
   }
 
@@ -69,40 +70,46 @@ export class EnemySpawner {
     }
 
     const spawnDirection = this.getRandomSpawnDirection();
-
     const enemyType = this.getRandomEnemyType();
 
-    const enemy = new Enemy(this.scene, 0, 0, enemyType, spawnDirection);
+    // Get spawn position
+    const spawnPos = this.getSpawnPosition(spawnDirection);
 
-    this.setEnemySpawnPosition(enemy, spawnDirection);
+    // Get enemy from pool
+    const enemy = this.enemyPool.getEnemy(enemyType, spawnDirection, spawnPos.x, spawnPos.y);
 
-    enemy.setTargetPosition(this.player.x, this.player.y);
-
-    this.enemies.add(enemy);
+    if (enemy) {
+      enemy.setTargetPosition(this.player.x, this.player.y);
+    }
   }
 
-  private setEnemySpawnPosition(enemy: Enemy, direction: SpawnDirection): void {
+  private getSpawnPosition(direction: SpawnDirection): { x: number; y: number } {
     const screenWidth = this.scene.cameras.main.width;
     const screenHeight = this.scene.cameras.main.height;
+    const enemySize = 50;
 
     switch (direction) {
       case SpawnDirection.LEFT:
-        enemy.x = -enemy.width;
-        enemy.y = MathUtils.random(enemy.height, screenHeight - enemy.height);
-        break;
+        return {
+          x: -enemySize,
+          y: MathUtils.random(enemySize, screenHeight - enemySize)
+        };
 
       case SpawnDirection.RIGHT:
-        enemy.x = screenWidth + enemy.width;
-        enemy.y = MathUtils.random(enemy.height, screenHeight - enemy.height);
-        break;
+        return {
+          x: screenWidth + enemySize,
+          y: MathUtils.random(enemySize, screenHeight - enemySize)
+        };
 
       case SpawnDirection.TOP:
-        enemy.x = MathUtils.random(enemy.width, screenWidth - enemy.width);
-        enemy.y = -enemy.height;
-        break;
-    }
+        return {
+          x: MathUtils.random(enemySize, screenWidth - enemySize),
+          y: -enemySize
+        };
 
-    console.log(enemy.x, enemy.y);
+      default:
+        return { x: 0, y: 0 };
+    }
   }
 
   private getRandomSpawnDirection(): SpawnDirection {
@@ -136,6 +143,22 @@ export class EnemySpawner {
   }
 
   public getEnemies(): Phaser.GameObjects.Group {
-    return this.enemies;
+    return this.enemyPool.getEnemyGroup();
+  }
+
+  public getActiveEnemies(): Enemy[] {
+    return this.enemyPool.getActiveEnemies();
+  }
+
+  public getPoolStats(): { active: number; pooled: number; total: number } {
+    return this.enemyPool.getPoolStats();
+  }
+
+  public clearEnemies(): void {
+    this.enemyPool.clearPool();
+  }
+
+  public destroy(): void {
+    this.enemyPool.destroy();
   }
 }
