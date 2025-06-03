@@ -1,11 +1,14 @@
 import Phaser from 'phaser';
-import { GameManager } from '../managers/gameManager';
-import { Player } from '../objects/player';
-import { EnemySpawner } from '../objects/enemySpawner';
-import { Enemy } from '../objects/enemy';
+import { GameManager } from '../managers/GameManager';
+import { Player } from '../objects/Player';
+import { EnemySpawner } from '../objects/EnemySpawner';
+import { Enemy } from '../objects/Enemy';
+import { HighScoreService } from '../services/HighScoreService';
+import { ServiceContainer, ServiceKeys } from '../services/ServiceContainer';
 
 export class GameScene extends Phaser.Scene {
   private readonly BACKGROUND_CHANGE_INTERVAL = 15000;
+  private highScoreService: HighScoreService;
 
   private readonly ENEMY_SPAWNER = {
     SPAWN_INTERVAL: 2.5,
@@ -43,42 +46,12 @@ export class GameScene extends Phaser.Scene {
     }
   };
 
-  private readonly MENU_BUTTONS = {
-    BACK: {
-      WIDTH: 200,
-      HEIGHT: 60,
-      TEXT: 'Back to Menu',
-      BACKGROUND_COLOR: '#e74c3c',
-      HOVER_COLOR: '#c0392b',
-      TEXT_COLOR: '#ffffff'
-    },
-    RESTART: {
-      WIDTH: 200,
-      HEIGHT: 60,
-      TEXT: 'Restart Game',
-      BACKGROUND_COLOR: '#3498db',
-      HOVER_COLOR: '#2980b9',
-      TEXT_COLOR: '#ffffff'
-    },
-    RESUME: {
-      WIDTH: 200,
-      HEIGHT: 60,
-      TEXT: 'Resume Game',
-      BACKGROUND_COLOR: '#34495e',
-      HOVER_COLOR: '#2c3e50',
-      TEXT_COLOR: '#ffffff'
-    }
-  };
-
   private player!: Player;
   private enemySpawner!: EnemySpawner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
 
   private timerText!: Phaser.GameObjects.Text;
   private optionsButton!: Phaser.GameObjects.Container;
-  private pauseMenu!: Phaser.GameObjects.Container;
-  private pauseBackground!: Phaser.GameObjects.Rectangle;
-  private gameOverUI!: Phaser.GameObjects.Container;
 
   private background!: Phaser.GameObjects.Image;
   private backgroundIndex: number = 2;
@@ -86,13 +59,21 @@ export class GameScene extends Phaser.Scene {
 
   private timeElapsed: number = 0;
   private isPaused: boolean = false;
+  private gameOverShown: boolean = false;
 
   constructor() {
     super({ key: 'GameScene' });
+
+    this.highScoreService = ServiceContainer.getInstance().resolve<HighScoreService>(ServiceKeys.HIGH_SCORE_SERVICE);
   }
 
   create() {
     GameManager.getInstance().reset();
+    this.scene.resume();
+    this.timeElapsed = 0;
+    this.gameOverShown = false;
+
+    this.events.emit('restart');
 
     this.createBackground();
 
@@ -104,18 +85,8 @@ export class GameScene extends Phaser.Scene {
 
     this.createTimer();
     this.createOptionsButton();
-    this.createPauseMenu();
-    this.createGameOverUI();
 
     this.setupCollisions();
-
-    this.setupPauseCallbacks();
-
-    this.game.events.on('blur', () => {
-      if (!GameManager.getInstance().getIsGameOver()) {
-        GameManager.getInstance().pause();
-      }
-    });
   }
 
   override update(time: number, delta: number) {
@@ -125,7 +96,7 @@ export class GameScene extends Phaser.Scene {
 
     this.enemySpawner.update(time, delta);
 
-    if (GameManager.getInstance().getIsGameOver() && !this.gameOverUI.visible) {
+    if (GameManager.getInstance().getIsGameOver() && !this.gameOverShown) {
       this.showGameOver();
     }
   }
@@ -262,148 +233,22 @@ export class GameScene extends Phaser.Scene {
 
     this.optionsButton.on('pointerdown', () => {
       if (!GameManager.getInstance().getIsGameOver()) {
-        GameManager.getInstance().setIsPaused(true);
+        this.scene.launch('OptionsScene');
       }
     });
-  }
-
-  private createPauseMenu(): void {
-    this.pauseBackground = this.add.rectangle(
-      this.scale.width / 2,
-      this.scale.height / 2,
-      this.scale.width,
-      this.scale.height,
-      0x000000,
-      0.8
-    );
-    this.pauseBackground.setVisible(false);
-
-    this.pauseMenu = this.add.container(this.scale.width / 2, this.scale.height / 2);
-
-    const resumeButton = this.createMenuButton(
-      0, -this.MENU_BUTTONS.RESUME.HEIGHT - 90,
-      this.MENU_BUTTONS.RESUME.TEXT,
-      this.MENU_BUTTONS.RESUME,
-      () => GameManager.getInstance().setIsPaused(false)
-    );
-
-    const restartButton = this.createMenuButton(
-      0, this.MENU_BUTTONS.RESTART.HEIGHT / 2,
-      this.MENU_BUTTONS.RESTART.TEXT,
-      this.MENU_BUTTONS.RESTART,
-      () => this.scene.start('GameScene')
-    );
-
-    const backButton = this.createMenuButton(
-      0, -this.MENU_BUTTONS.BACK.HEIGHT,
-      this.MENU_BUTTONS.BACK.TEXT,
-      this.MENU_BUTTONS.BACK,
-      () => this.scene.start('StartScene')
-    );
-
-    this.pauseMenu.add([resumeButton, restartButton, backButton]);
-    this.pauseMenu.setVisible(false);
-  }
-
-  private createMenuButton(x: number, y: number, text: string, config: any, onClick: () => void): Phaser.GameObjects.Container {
-    const button = this.add.container(x, y);
-
-    const bg = this.add.rectangle(
-      0, 0,
-      config.WIDTH,
-      config.HEIGHT,
-      Phaser.Display.Color.HexStringToColor(config.BACKGROUND_COLOR).color
-    );
-
-    const buttonText = this.add.text(0, 0, text, {
-      fontSize: '18px',
-      color: config.TEXT_COLOR,
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-
-    button.add([bg, buttonText]);
-    button.setSize(config.WIDTH, config.HEIGHT);
-    button.setInteractive();
-
-    button.on('pointerover', () => {
-      bg.setFillStyle(Phaser.Display.Color.HexStringToColor(config.HOVER_COLOR).color);
-    });
-
-    button.on('pointerout', () => {
-      bg.setFillStyle(Phaser.Display.Color.HexStringToColor(config.BACKGROUND_COLOR).color);
-    });
-
-    button.on('pointerdown', onClick);
-
-    return button;
-  }
-
-  private createGameOverUI(): void {
-    this.gameOverUI = this.add.container(this.scale.width / 2, this.scale.height / 2);
-
-    const bg = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000, 0.8);
-
-    const popup = this.add.rectangle(0, 0, 600, 400, 0x2c3e50);
-    popup.setStrokeStyle(3, 0x34495e);
-
-    const title = this.add.text(0, -100, 'GAME OVER', {
-      fontSize: '32px',
-      color: '#e74c3c',
-      fontStyle: 'bold',
-      stroke: 'rgba(0, 0, 0, 0.9)',
-      strokeThickness: 4,
-      shadow: {
-        offsetX: 2,
-        offsetY: 2,
-        color: 'rgba(0, 0, 0, 0.9)',
-        blur: 4,
-        stroke: true,
-        fill: true
-      }
-    }).setOrigin(0.5);
-
-    const scoreText = this.add.text(0, -50, '', {
-      fontSize: '24px',
-      color: '#ecf0f1',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-
-    const restartBtn = this.createMenuButton(
-      -75, 50,
-      'Restart',
-      { WIDTH: 150, HEIGHT: 60, BACKGROUND_COLOR: '#3498db', HOVER_COLOR: '#2980b9', TEXT_COLOR: '#ffffff' },
-      () => {
-        GameManager.getInstance().reset();
-        this.scene.start('GameScene');
-      }
-    );
-
-    const highScoreBtn = this.createMenuButton(
-      75, 50,
-      'High Scores',
-      { WIDTH: 150, HEIGHT: 60, BACKGROUND_COLOR: '#e74c3c', HOVER_COLOR: '#c0392b', TEXT_COLOR: '#ffffff' },
-      () => {
-        this.scene.start('HighScoreScene');
-      }
-    );
-
-    this.gameOverUI.add([bg, popup, title, scoreText, restartBtn, highScoreBtn]);
-    this.gameOverUI.setVisible(false);
-
-    (this.gameOverUI as any).scoreText = scoreText;
   }
 
   private showGameOver(): void {
-    const scoreText = (this.gameOverUI as any).scoreText;
-    scoreText.setText(`Your Score: ${Math.floor(this.timeElapsed)} points`);
-
     const currentScore = Math.floor(this.timeElapsed);
-    const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
-    if (currentScore > bestScore) {
-      localStorage.setItem('bestScore', currentScore.toString());
-    }
 
-    this.gameOverUI.setVisible(true);
+    this.saveScore(currentScore);
+
+    this.scene.stop();
+    this.scene.launch('GameOverScene', { score: currentScore });
+  }
+
+  private saveScore(score: number): void {
+    this.highScoreService.addScore(score, Date.now());
   }
 
   private setupCollisions(): void {
@@ -417,22 +262,6 @@ export class GameScene extends Phaser.Scene {
       if (!died) {
         enemySprite.destroy();
       }
-    });
-  }
-
-  private setupPauseCallbacks(): void {
-    GameManager.getInstance().addPauseCallback(() => {
-      this.pauseBackground.setVisible(true);
-      this.pauseMenu.setVisible(true);
-      this.physics.pause();
-      this.backgroundInterval.paused = true;
-    });
-
-    GameManager.getInstance().addResumeCallback(() => {
-      this.pauseBackground.setVisible(false);
-      this.pauseMenu.setVisible(false);
-      this.physics.resume();
-      this.backgroundInterval.paused = false;
     });
   }
 

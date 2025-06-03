@@ -143,7 +143,6 @@ export class LoadingScene extends Phaser.Scene {
         const totalFrames = this.textures.get(textureKey).frameTotal - 1;
         const startFrame = Math.max(0, totalFrames - useLastNFrames);
         const endFrame = totalFrames - 1;
-        // console.log(`Creating ${animKey} animation using last ${useLastNFrames} frames (${startFrame}-${endFrame}) from ${totalFrames} total frames`);
         frames = this.anims.generateFrameNumbers(textureKey, { start: startFrame, end: endFrame });
       } else {
         frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
