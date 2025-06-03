@@ -50,6 +50,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.controller.update(deltaTime);
     this.health.update(deltaTime);
     this.stateManager.update(this.controller.getIsReversed());
+
+    this.handleOutOfBounds();
+  }
+
+  private handleOutOfBounds(): void {
+    if (this.x < -this.width || this.x > this.scene.cameras.main.width + this.width || this.y < -this.height || this.y > this.scene.cameras.main.height + this.height) {
+      this.health.takeDamage(50);
+      this.setPosition(this.scene.cameras.main.width / 2, this.scene.cameras.main.height / 2);
+    }
   }
 
   public takeDamage(damage: number): boolean {
