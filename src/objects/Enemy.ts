@@ -92,13 +92,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
+
     const direction = this.getDirection();
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
+    this.body?.velocity.set(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
 
     this.rotation = Math.atan2(
-      body.velocity.y,
-      body.velocity.x
+      this.body?.velocity.y ?? 0,
+      this.body?.velocity.x ?? 0
     );
 
     this.checkBounds();
