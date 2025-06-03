@@ -19,26 +19,32 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createLoadingUI() {
-    this.add.rectangle(360, 640, 720, 1280, 0x2c3e50);
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+    const screenWidth = this.cameras.main.width;
+    const screenHeight = this.cameras.main.height;
 
-    this.add.text(360, 400, 'DODGE THE SPIKE', {
+    this.add.rectangle(centerX, centerY, screenWidth, screenHeight, 0x2c3e50);
+
+    this.add.text(centerX, screenHeight * 0.3, 'DODGE THE SPIKE', {
       fontSize: '48px',
       color: '#ffffff',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.add.text(360, 470, 'Loading...', {
+    this.add.text(centerX, screenHeight * 0.4, 'Loading...', {
       fontSize: '24px',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    const loadingBarBg = this.add.rectangle(360, 640, 400, 30, 0x34495e);
+    const loadingBarWidth = Math.min(400, screenWidth * 0.6);
+    const loadingBarBg = this.add.rectangle(centerX, centerY, loadingBarWidth, 30, 0x34495e);
     loadingBarBg.setStrokeStyle(2, 0xffffff);
 
-    const loadingBar = this.add.rectangle(360, 640, 396, 26, 0x3498db);
+    const loadingBar = this.add.rectangle(centerX, centerY, loadingBarWidth - 4, 26, 0x3498db);
     loadingBar.scaleX = 0;
 
-    const loadingText = this.add.text(360, 700, 'Loading Assets... 0%', {
+    const loadingText = this.add.text(centerX, screenHeight * 0.6, 'Loading Assets... 0%', {
       fontSize: '18px',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -122,6 +128,8 @@ export class LoadingScene extends Phaser.Scene {
       } else {
         frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
       }
+
+      console.log(`Creating animation ${animKey} with ${frames.length} frames`);
 
       this.anims.create({
         key: animKey,
