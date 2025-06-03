@@ -1,10 +1,5 @@
 import { Storage } from '../interface/storage';
-
-export interface ScoreEntry {
-  score: number;
-  time: string;
-  date: string;
-}
+import { ScoreEntry } from '../interface/scoreEnty';
 
 export class HighScoreService {
   private static readonly STORAGE_KEY = 'gameHighScore';

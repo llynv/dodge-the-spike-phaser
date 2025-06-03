@@ -2,6 +2,8 @@ import { ServiceContainer, ServiceKeys } from './ServiceContainer';
 import { Storage } from '../interface/storage';
 import { HighScoreRepository } from '../repositories/HighScoreRepository';
 import { HighScoreService } from './HighScoreService';
+import { ServiceConfig } from '../interface/serviceConfig';
+import { StorageConfig } from '../interface/storageConfig';
 
 /**
  * Service Bootstrapper - handles service registration and configuration
@@ -63,12 +65,4 @@ export class ServiceBootstrapper {
   public cleanup(): void {
     this.container.clear();
   }
-}
-
-export interface ServiceConfig {
-  storage?: StorageConfig;
-}
-
-export interface StorageConfig {
-  type: 'localStorage' | 'cloud' | 'hybrid';
 }
