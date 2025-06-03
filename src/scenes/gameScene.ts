@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { GameManager } from '../managers/game-manager';
+import { GameManager } from '../managers/gameManager';
 import { Player } from '../objects/player';
-import { EnemySpawner } from '../objects/enemy-spawner';
+import { EnemySpawner } from '../objects/enemySpawner';
 import { Enemy } from '../objects/enemy';
 
 export class GameScene extends Phaser.Scene {

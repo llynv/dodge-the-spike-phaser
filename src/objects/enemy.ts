@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameManager } from '../managers/game-manager';
+import { GameManager } from '../managers/gameManager';
 import { Vec2 } from '../utils/math/vec2';
 
 export enum SpawnDirection {

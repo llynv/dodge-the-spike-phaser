@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { Enemy, EnemyType, SpawnDirection } from './enemy';
-import { GameManager } from '../managers/game-manager';
+import { GameManager } from '../managers/gameManager';
 import { Player } from './player';
 import { Vec2 } from '../utils/math/vec2';
-import { MathUtils } from '../utils/math/math-utils';
+import { MathUtils } from '../utils/math/mathUtils';
 
 export class EnemySpawner {
   private scene: Phaser.Scene;

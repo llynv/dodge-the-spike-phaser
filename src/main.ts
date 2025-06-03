@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import '../style.css';
-import { LoadingScene } from './scenes/loading-scene';
-import { StartScene } from './scenes/start-scene';
-import { GameScene } from './scenes/game-scene';
-import { HighScoreScene } from './scenes/highscore-scene';
+import { LoadingScene } from './scenes/loadingScene';
+import { StartScene } from './scenes/startScene';
+import { GameScene } from './scenes/gameScene';
+import { HighScoreScene } from './scenes/highscoreScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
