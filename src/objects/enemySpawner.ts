@@ -23,11 +23,6 @@ export class EnemySpawner {
     [EnemyType.FAST]: 20,
     [EnemyType.TANK]: 10
   };
-  private enemyColors: Record<EnemyType, string> = {
-    [EnemyType.BASIC]: 'red',
-    [EnemyType.FAST]: 'blue',
-    [EnemyType.TANK]: 'green'
-  };
 
   private currentSpawnRate: number;
   private lastSpawnTime: number = 0;

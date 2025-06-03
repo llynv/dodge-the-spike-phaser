@@ -76,6 +76,10 @@ export class LoadingScene extends Phaser.Scene {
       frameWidth: 155,
       frameHeight: 280
     });
+    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/enemy_fire.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
 
     this.load.on('loaderror', (file: any) => {
       console.warn(`Failed to load asset: ${file.key} from ${file.url}`);
@@ -83,48 +87,64 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createAnimations() {
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_idle',
       'player_idle',
       20,
       -1
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_jump',
       'player_jump',
       8,
       -1,
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_run',
       'player_run',
       20,
       -1
     );
 
-    this.createPlayerAnimation(
+    this.createAnimation(
       'player_fall',
       'player_jump',
       8,
       -1,
       true
     );
+
+    this.createAnimation(
+      'enemy_fire',
+      'enemy_fire',
+      12,
+      -1,
+      false,
+      8
+    );
   }
 
-  private createPlayerAnimation(
+  private createAnimation(
     animKey: string,
     textureKey: string,
     frameRate: number,
     repeat: number,
-    useLastFrame: boolean = false
+    useLastFrame: boolean = false,
+    useLastNFrames?: number
   ) {
     if (this.textures.exists(textureKey) && this.textures.get(textureKey).frameTotal > 1) {
       let frames;
       if (useLastFrame) {
         const lastFrame = Math.max(0, this.textures.get(textureKey).frameTotal - 1);
         frames = this.anims.generateFrameNumbers(textureKey, { start: lastFrame, end: lastFrame });
+      } else if (useLastNFrames) {
+        const totalFrames = this.textures.get(textureKey).frameTotal - 1;
+        const startFrame = Math.max(0, totalFrames - useLastNFrames);
+        const endFrame = totalFrames - 1;
+        // console.log(`Creating ${animKey} animation using last ${useLastNFrames} frames (${startFrame}-${endFrame}) from ${totalFrames} total frames`);
+        frames = this.anims.generateFrameNumbers(textureKey, { start: startFrame, end: endFrame });
       } else {
         frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
       }
