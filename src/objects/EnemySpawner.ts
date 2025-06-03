@@ -72,10 +72,8 @@ export class EnemySpawner {
     const spawnDirection = this.getRandomSpawnDirection();
     const enemyType = this.getRandomEnemyType();
 
-    // Get spawn position
     const spawnPos = this.getSpawnPosition(spawnDirection);
 
-    // Get enemy from pool
     const enemy = this.enemyPool.getEnemy(enemyType, spawnDirection, spawnPos.x, spawnPos.y);
 
     if (enemy) {

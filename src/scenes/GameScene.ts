@@ -99,6 +99,9 @@ export class GameScene extends Phaser.Scene {
 
     this.events.emit('restart');
 
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keydown', this.handleKeyDown);
+
     this.createBackground();
 
     this.createGround();
@@ -130,6 +133,13 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.updatePerformanceDisplay();
+  }
+
+  private handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'p') {
+      this.showPerformanceStats = !this.showPerformanceStats;
+      this.performanceText?.setVisible(this.showPerformanceStats);
+    }
   }
 
   private updateTimer(time: number, delta: number): void {
