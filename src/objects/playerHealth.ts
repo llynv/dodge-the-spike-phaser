@@ -1,4 +1,4 @@
-import { GameManager } from '../managers/gameManager';
+import { GameManager } from '../managers/GameManager';
 
 export class PlayerHealth {
   private readonly MAX_HEALTH = 100;

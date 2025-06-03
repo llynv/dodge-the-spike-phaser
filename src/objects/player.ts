@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { PlayerHealth } from './playerHealth';
-import { PlayerStateManager, PlayerState } from './playerStateManager';
-import { PlayerController } from './playerController';
+import { PlayerHealth } from './PlayerHealth';
+import { PlayerStateManager, PlayerState } from './PlayerStateManager';
+import { PlayerController } from './PlayerController';
 
-export { PlayerState } from './playerStateManager';
+export { PlayerState } from './PlayerStateManager';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private readonly PLAYER_CONFIG = {

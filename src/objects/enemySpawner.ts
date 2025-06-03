@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { Enemy, EnemyType, SpawnDirection } from './enemy';
-import { GameManager } from '../managers/gameManager';
-import { Player } from './player';
+import { Enemy, EnemyType, SpawnDirection } from './Enemy';
+import { GameManager } from '../managers/GameManager';
+import { Player } from './Player';
 import { Vec2 } from '../utils/math/vec2';
 import { MathUtils } from '../utils/math/mathUtils';
 

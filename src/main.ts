@@ -1,9 +1,13 @@
 import Phaser from 'phaser';
 import '../style.css';
-import { LoadingScene } from './scenes/loadingScene';
-import { StartScene } from './scenes/startScene';
-import { GameScene } from './scenes/gameScene';
-import { HighScoreScene } from './scenes/highscoreScene';
+import { LoadingScene } from './scenes/LoadingScene';
+import { StartScene } from './scenes/StartScene';
+import { GameScene } from './scenes/GameScene';
+import { HighScoreScene } from './scenes/HighScoreScene';
+import { OptionsScene } from './scenes/OptionsScene';
+import { GameOverScene } from './scenes/GameOverScene';
+import { ServiceConfig } from './interface/serviceConfig';
+import { ServiceBootstrapper } from './services/ServiceBootstrapper';
 
 function getGameDimensions() {
   const isLandscape = window.innerWidth > window.innerHeight;
@@ -32,6 +36,15 @@ function getGameDimensions() {
 
 const dimensions = getGameDimensions();
 
+const bootstrapper = new ServiceBootstrapper();
+const serviceConfig: ServiceConfig = {
+  storage: {
+    type: 'localStorage'
+  }
+};
+bootstrapper.initializeServices(serviceConfig);
+
+
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: dimensions.width,
@@ -59,7 +72,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: true
     }
   },
-  scene: [LoadingScene, StartScene, GameScene, HighScoreScene]
+  scene: [LoadingScene, StartScene, GameScene, HighScoreScene, OptionsScene, GameOverScene]
 };
 
 const game = new Phaser.Game(config);

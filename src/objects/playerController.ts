@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameManager } from '../managers/gameManager';
+import { GameManager } from '../managers/GameManager';
 
 export class PlayerController {
   private readonly PHYSICS_CONFIG = {
