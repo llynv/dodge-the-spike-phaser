@@ -68,12 +68,14 @@ export class GameScene extends Phaser.Scene {
   private timerText!: Phaser.GameObjects.Text;
   private optionsButton!: Phaser.GameObjects.Container;
 
-  // Health bar components
   private healthBarContainer!: Phaser.GameObjects.Container;
   private healthBarBackground!: Phaser.GameObjects.Rectangle;
   private healthBarBorder!: Phaser.GameObjects.Rectangle;
   private healthBarFill!: Phaser.GameObjects.Rectangle;
   private healthText!: Phaser.GameObjects.Text;
+
+  private performanceText!: Phaser.GameObjects.Text;
+  private showPerformanceStats: boolean = false;
 
   private background!: Phaser.GameObjects.Image;
   private backgroundIndex: number = 2;
@@ -108,8 +110,10 @@ export class GameScene extends Phaser.Scene {
     this.createTimer();
     this.createHealthBar();
     this.createOptionsButton();
+    this.createPerformanceDisplay();
 
     this.setupCollisions();
+    this.setupDebugControls();
   }
 
   override update(time: number, delta: number) {
@@ -119,12 +123,13 @@ export class GameScene extends Phaser.Scene {
 
     this.enemySpawner.update(time, delta);
 
-    // Update health bar display
     this.updateHealthBar();
 
     if (GameManager.getInstance().getIsGameOver() && !this.gameOverShown) {
       this.showGameOver();
     }
+
+    this.updatePerformanceDisplay();
   }
 
   private updateTimer(time: number, delta: number): void {
@@ -342,6 +347,23 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private createPerformanceDisplay(): void {
+    this.performanceText = this.add.text(
+      10,
+      this.scale.height - 80,
+      '',
+      {
+        fontSize: '12px',
+        color: '#00ff00',
+        fontFamily: 'monospace',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        padding: { left: 5, right: 5, top: 2, bottom: 2 }
+      }
+    );
+    this.performanceText.setDepth(1001);
+    this.performanceText.setVisible(this.showPerformanceStats);
+  }
+
   private showGameOver(): void {
     const currentScore = Math.floor(this.timeElapsed);
 
@@ -358,18 +380,54 @@ export class GameScene extends Phaser.Scene {
   private setupCollisions(): void {
     this.physics.add.collider(this.player, this.platforms);
 
-    this.physics.add.overlap(this.player, this.enemySpawner.getEnemies(), (player, enemy) => {
-      const playerSprite = player as Player;
-      const enemySprite = enemy as Enemy;
+    this.physics.add.overlap(
+      this.player,
+      this.enemySpawner.getEnemies(),
+      (player, enemy) => {
+        const playerSprite = player as Player;
+        const enemySprite = enemy as Enemy;
 
-      const died = playerSprite.takeDamage(enemySprite.getDamage());
-      if (!died) {
-        enemySprite.destroy();
+        if (!enemySprite.getIsActive() || !enemySprite.visible || !enemySprite.active) {
+          return;
+        }
+
+        const died = playerSprite.takeDamage(enemySprite.getDamage());
+        if (!died) {
+          enemySprite.returnToPool();
+        }
       }
+    );
+  }
+
+  private setupDebugControls(): void {
+    this.input.keyboard?.on('keydown-P', () => {
+      this.showPerformanceStats = !this.showPerformanceStats;
+      this.performanceText.setVisible(this.showPerformanceStats);
     });
+  }
+
+  private updatePerformanceDisplay(): void {
+    if (!this.showPerformanceStats) return;
+
+    const poolStats = this.enemySpawner.getPoolStats();
+    const fps = this.game.loop.actualFps;
+
+    const perfText = [
+      `FPS: ${Math.round(fps)}`,
+      `Enemies - Active: ${poolStats.active}`,
+      `Enemies - Pooled: ${poolStats.pooled}`,
+      `Enemies - Total: ${poolStats.total}`
+    ].join('\n');
+
+    this.performanceText.setText(perfText);
   }
 
   shutdown() {
     this.backgroundInterval.destroy();
+    this.enemySpawner.destroy();
+
+    if (this.performanceText) {
+      this.performanceText.destroy();
+    }
   }
 }
