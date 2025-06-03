@@ -42,12 +42,38 @@ export class GameScene extends Phaser.Scene {
     }
   };
 
+  private readonly HEALTH_BAR = {
+    POSITION: {
+      X: 20,
+      Y: 80
+    },
+    SIZE: {
+      WIDTH: 200,
+      HEIGHT: 20
+    },
+    COLORS: {
+      BACKGROUND: 0x000000,
+      BORDER: 0x333333,
+      FULL_HEALTH: 0x00ff00,
+      MEDIUM_HEALTH: 0xffff00,
+      LOW_HEALTH: 0xff0000
+    },
+    BORDER_WIDTH: 2
+  };
+
   private player!: Player;
   private enemySpawner!: EnemySpawner;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
 
   private timerText!: Phaser.GameObjects.Text;
   private optionsButton!: Phaser.GameObjects.Container;
+
+  // Health bar components
+  private healthBarContainer!: Phaser.GameObjects.Container;
+  private healthBarBackground!: Phaser.GameObjects.Rectangle;
+  private healthBarBorder!: Phaser.GameObjects.Rectangle;
+  private healthBarFill!: Phaser.GameObjects.Rectangle;
+  private healthText!: Phaser.GameObjects.Text;
 
   private background!: Phaser.GameObjects.Image;
   private backgroundIndex: number = 2;
@@ -80,6 +106,7 @@ export class GameScene extends Phaser.Scene {
     this.createEnemySpawner();
 
     this.createTimer();
+    this.createHealthBar();
     this.createOptionsButton();
 
     this.setupCollisions();
@@ -91,6 +118,9 @@ export class GameScene extends Phaser.Scene {
     this.player.update(time, delta);
 
     this.enemySpawner.update(time, delta);
+
+    // Update health bar display
+    this.updateHealthBar();
 
     if (GameManager.getInstance().getIsGameOver() && !this.gameOverShown) {
       this.showGameOver();
@@ -194,6 +224,85 @@ export class GameScene extends Phaser.Scene {
 
   private updateTimerDisplay(): void {
     this.timerText.setText(`Points: ${Math.floor(this.timeElapsed)}`);
+  }
+
+  private createHealthBar(): void {
+    this.healthBarContainer = this.add.container(
+      this.HEALTH_BAR.POSITION.X,
+      this.HEALTH_BAR.POSITION.Y
+    );
+
+    this.healthBarBackground = this.add.rectangle(
+      0, 0,
+      this.HEALTH_BAR.SIZE.WIDTH,
+      this.HEALTH_BAR.SIZE.HEIGHT,
+      this.HEALTH_BAR.COLORS.BACKGROUND
+    );
+    this.healthBarBackground.setOrigin(0, 0.5);
+
+    this.healthBarBorder = this.add.rectangle(
+      0, 0,
+      this.HEALTH_BAR.SIZE.WIDTH + this.HEALTH_BAR.BORDER_WIDTH,
+      this.HEALTH_BAR.SIZE.HEIGHT + this.HEALTH_BAR.BORDER_WIDTH,
+      this.HEALTH_BAR.COLORS.BORDER
+    );
+    this.healthBarBorder.setOrigin(0, 0.5);
+    this.healthBarBorder.setStrokeStyle(this.HEALTH_BAR.BORDER_WIDTH, this.HEALTH_BAR.COLORS.BORDER);
+
+    this.healthBarFill = this.add.rectangle(
+      0, 0,
+      this.HEALTH_BAR.SIZE.WIDTH,
+      this.HEALTH_BAR.SIZE.HEIGHT,
+      this.HEALTH_BAR.COLORS.FULL_HEALTH
+    );
+    this.healthBarFill.setOrigin(0, 0.5);
+
+    this.healthText = this.add.text(
+      this.HEALTH_BAR.SIZE.WIDTH / 2,
+      0,
+      '100/100',
+      {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontFamily: 'Arial',
+        fontStyle: 'bold',
+        stroke: 'rgba(0, 0, 0, 0.8)',
+        strokeThickness: 2
+      }
+    );
+    this.healthText.setOrigin(0.5, 0.5);
+
+    this.healthBarContainer.add([
+      this.healthBarBorder,
+      this.healthBarBackground,
+      this.healthBarFill,
+      this.healthText
+    ]);
+
+    this.healthBarContainer.setDepth(1000);
+  }
+
+  private updateHealthBar(): void {
+    if (!this.player || !this.healthBarFill || !this.healthText) {
+      return;
+    }
+
+    const currentHealth = this.player.getHealth();
+    const maxHealth = this.player.getMaxHealth();
+    const healthPercentage = currentHealth / maxHealth;
+
+    const fillWidth = this.HEALTH_BAR.SIZE.WIDTH * healthPercentage;
+    this.healthBarFill.setDisplaySize(fillWidth, this.HEALTH_BAR.SIZE.HEIGHT);
+
+    this.healthText.setText(`${Math.ceil(currentHealth)}/${maxHealth}`);
+
+    let color = this.HEALTH_BAR.COLORS.FULL_HEALTH;
+    if (healthPercentage <= 0.25) {
+      color = this.HEALTH_BAR.COLORS.LOW_HEALTH;
+    } else if (healthPercentage <= 0.5) {
+      color = this.HEALTH_BAR.COLORS.MEDIUM_HEALTH;
+    }
+    this.healthBarFill.setFillStyle(color);
   }
 
   private createOptionsButton(): void {
