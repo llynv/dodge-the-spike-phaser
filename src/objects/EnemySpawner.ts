@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { Enemy, EnemyType, SpawnDirection } from './enemy';
-import { GameManager } from '../managers/game-manager';
-import { Player } from './player';
+import { Enemy, EnemyType, SpawnDirection } from './Enemy';
+import { GameManager } from '../managers/GameManager';
+import { Player } from './Player';
 import { Vec2 } from '../utils/math/vec2';
-import { MathUtils } from '../utils/math/math-utils';
+import { MathUtils } from '../utils/math/mathUtils';
 
 export class EnemySpawner {
   private scene: Phaser.Scene;
@@ -22,11 +22,6 @@ export class EnemySpawner {
     [EnemyType.BASIC]: 70,
     [EnemyType.FAST]: 20,
     [EnemyType.TANK]: 10
-  };
-  private enemyColors: Record<EnemyType, string> = {
-    [EnemyType.BASIC]: 'red',
-    [EnemyType.FAST]: 'blue',
-    [EnemyType.TANK]: 'green'
   };
 
   private currentSpawnRate: number;

@@ -35,8 +35,74 @@ body {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+
+  /* Default: Portrait/Mobile - Thinner container */
   max-height: 95vh;
   max-width: 95vw;
+  width: auto;
+  height: auto;
+}
+
+/* Landscape orientation - Wider container */
+@media screen and (orientation: landscape) {
+  #game-container {
+    max-width: 90vw;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+  }
+
+  h1 {
+    font-size: 2em;
+    min-height: 50px;
+  }
+}
+
+/* Portrait orientation - Thinner container */
+@media screen and (orientation: portrait) {
+  #game-container {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+  }
+}
+
+/* Desktop/Large screens - Wider container */
+@media screen and (min-width: 1024px) {
+  #game-container {
+    max-width: 80vw;
+    max-height: 85vh;
+  }
+}
+
+/* Mobile devices - Thinner container */
+@media screen and (max-width: 768px) {
+  #game-container {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+    min-height: 45px;
+  }
+}
+
+/* Very small mobile devices */
+@media screen and (max-width: 480px) {
+  #game-container {
+    max-width: 98vw;
+    max-height: 98vh;
+    padding: 10px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 1.6em;
+    min-height: 40px;
+  }
 }
 
 #game-container::before {
@@ -65,6 +131,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 @keyframes titleGlow {
@@ -90,12 +157,31 @@ h1 {
   transition: all 0.3s ease;
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100%;
 }
 
 canvas {
   display: block;
   margin: 0 auto;
   border-radius: 15px;
-  max-height: 90vh;
-  max-width: 90vw;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Responsive canvas adjustments */
+@media screen and (orientation: landscape) {
+  canvas {
+    max-width: 100%;
+    max-height: 70vh;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  canvas {
+    max-width: 90vw;
+    max-height: 80vh;
+  }
 }
