@@ -40,6 +40,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.health = new PlayerHealth(this);
     this.stateManager = new PlayerStateManager(this);
     this.controller = new PlayerController(this, scene);
+    console.log('PlayerController ', this.controller);
 
     this.stateManager.update(false);
   }
