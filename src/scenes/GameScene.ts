@@ -14,10 +14,6 @@ export class GameScene extends Phaser.Scene {
     SPAWN_INTERVAL: 2.5,
     MIN_SPAWN_INTERVAL: 0.5,
     SPAWN_RATE_INCREASE: 0.1,
-    ENEMY_SIZE: {
-      WIDTH: 50,
-      HEIGHT: 50
-    }
   };
 
   private readonly PLAYER = {
@@ -169,7 +165,6 @@ export class GameScene extends Phaser.Scene {
   private createEnemySpawner(): void {
     this.enemySpawner = new EnemySpawner(this);
     this.enemySpawner.setPlayer(this.player);
-    this.enemySpawner.setEnemySize(this.ENEMY_SPAWNER.ENEMY_SIZE.WIDTH, this.ENEMY_SPAWNER.ENEMY_SIZE.HEIGHT);
   }
 
   private createTimer(): void {
