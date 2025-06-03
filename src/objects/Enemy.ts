@@ -73,18 +73,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.spawnDirection = spawnDirection;
     this.isActive = true;
 
-    // Enable physics and visibility
     this.setActive(true);
     this.setVisible(true);
 
-    // Enable physics body
     if (this.body) {
       this.body.enable = true;
     }
 
     this.setupEnemyConfig();
 
-    // Reset movement properties
     this.body?.velocity.set(0, 0);
     this.baseDirection = Vec2.Zero;
     this.setRotation(0);
@@ -94,22 +91,18 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public reset(): void {
     this.isActive = false;
 
-    // Disable physics and visibility
     this.setActive(false);
     this.setVisible(false);
 
-    // Disable physics body to prevent collisions
     if (this.body) {
       this.body.enable = false;
       this.body.velocity.set(0, 0);
     }
 
-    // Reset all properties
     this.baseDirection = Vec2.Zero;
     this.targetX = 0;
     this.targetY = 0;
 
-    // Move to a safe position off-screen
     this.setPosition(-1000, -1000);
     this.setRotation(0);
     this.setFlipY(false);
@@ -120,7 +113,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.setScale(config.SCALE);
 
-    // Set up physics body size
     if (this.body) {
       this.body.setSize(this.width / 2, this.height / 2);
       this.body.setOffset(this.width / 4, this.height / 4);
@@ -139,7 +131,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override update(time: number, delta: number): void {
-    // Only update if active and game is running
     if (!this.isActive || !this.visible || GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
       return;
     }
@@ -203,7 +194,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return this.baseDirection;
   }
 
-  // Override destroy to return to pool instead
   public override destroy(fromScene?: boolean): void {
     if (this.isActive) {
       this.returnToPool();
