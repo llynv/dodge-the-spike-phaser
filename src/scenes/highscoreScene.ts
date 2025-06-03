@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
+import { HighScoreService } from '../services/HighScoreService';
+import { ServiceContainer, ServiceKeys } from '../services/ServiceContainer';
 
 export class HighScoreScene extends Phaser.Scene {
+
+  private highScoreService: HighScoreService;
+
   private readonly TITLE = {
     Y_POSITION: 100,
     FONT_SIZE: 40,
@@ -18,17 +23,23 @@ export class HighScoreScene extends Phaser.Scene {
 
   private readonly COLORS = {
     FALLBACK_BACKGROUND: '#333333',
-    WHITE: 'white',
-    GOLD: '#ffd700',
-    SILVER: '#c0c0c0',
-    BRONZE: '#cd7f32'
+    WHITE: '#ffffff',
+    BLACK: '#000000',
+    GOLD: '#B8860B',
+    SILVER: '#696969',
+    BRONZE: '#8B4513',
+    HEADER: '#333333',
+    TIME: '#1E3A8A',
+    DATE: '#4B5563',
+    INFO: '#6B7280'
   };
 
   constructor() {
     super({ key: 'HighScoreScene' });
+    this.highScoreService = ServiceContainer.getInstance().resolve<HighScoreService>(ServiceKeys.HIGH_SCORE_SERVICE);
   }
 
-  create() {
+  async create() {
     this.createBackground();
     this.createTitle();
     this.createScoreList();
@@ -59,49 +70,111 @@ export class HighScoreScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
-  private createScoreList(): void {
-    const bestScore = localStorage.getItem('bestScore') || '0';
+  private async createScoreList(): Promise<void> {
+    const allScores = await this.highScoreService.getHighScores();
 
-    const scores = [
-      { score: parseInt(bestScore), name: 'You' },
-      { score: 0, name: 'No Score' },
-      { score: 0, name: 'No Score' },
-      { score: 0, name: 'No Score' },
-      { score: 0, name: 'No Score' }
-    ];
+    const screenWidth = this.scale.width;
+    const screenHeight = this.scale.height;
+    const isMobile = screenWidth < 600;
 
-    const startY = 250;
-    const spacing = 80;
+    const startY = isMobile ? 180 : 200;
+    const spacing = isMobile ? 35 : 45;
+    const fontSize = isMobile ? '14px' : '18px';
+    const rankFontSize = isMobile ? '16px' : '20px';
 
-    scores.forEach((entry, index) => {
+    const backButtonY = screenHeight - 150;
+    const maxY = backButtonY - 50;
+
+    const availableHeight = maxY - startY;
+    const maxScores = Math.floor(availableHeight / spacing);
+    const scoresToShow = Math.min(allScores.length, maxScores);
+    const displayScores = allScores.slice(0, scoresToShow);
+
+    const rankX = isMobile ? 50 : 70;
+    const scoreX = screenWidth * 0.3;
+    const timeX = screenWidth * 0.6;
+    const dateX = screenWidth - (isMobile ? 60 : 100);
+
+    const headerY = startY - (isMobile ? 40 : 50);
+    this.add.text(rankX, headerY, 'Rank', {
+      fontSize: isMobile ? '12px' : '14px',
+      color: this.COLORS.HEADER,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.add.text(scoreX, headerY, 'Score', {
+      fontSize: isMobile ? '12px' : '14px',
+      color: this.COLORS.HEADER,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.add.text(timeX, headerY, 'Time', {
+      fontSize: isMobile ? '12px' : '14px',
+      color: this.COLORS.HEADER,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    this.add.text(dateX, headerY, 'Date', {
+      fontSize: isMobile ? '12px' : '14px',
+      color: this.COLORS.HEADER,
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+
+    const lineY = headerY + (isMobile ? 20 : 25);
+    const line = this.add.graphics();
+    line.lineStyle(2, 0x333333);
+    line.moveTo(isMobile ? 20 : 30, lineY);
+    line.lineTo(screenWidth - (isMobile ? 20 : 30), lineY);
+    line.stroke();
+
+
+    displayScores.forEach((entry, index) => {
       const y = startY + (index * spacing);
-
       const rank = index + 1;
       const rankColor = this.getRankColor(rank);
 
-      this.add.text(150, y, `${rank}.`, {
-        fontSize: '24px',
+      this.add.text(rankX, y, `${rank}`, {
+        fontSize: rankFontSize,
         color: rankColor,
         fontStyle: 'bold'
-      }).setOrigin(0, 0.5);
+      }).setOrigin(0.5);
 
-      this.add.text(this.scale.width / 2, y, `${entry.score} points`, {
-        fontSize: '24px',
-        color: this.COLORS.WHITE,
+      this.add.text(scoreX, y, `${entry.score}`, {
+        fontSize: fontSize,
+        color: this.COLORS.BLACK,
         fontStyle: 'bold'
-      }).setOrigin(0.5, 0.5);
+      }).setOrigin(0.5);
 
-      this.add.text(570, y, entry.name, {
-        fontSize: '18px',
-        color: '#cccccc'
-      }).setOrigin(1, 0.5);
+      this.add.text(timeX, y, entry.time, {
+        fontSize: isMobile ? '12px' : fontSize,
+        color: this.COLORS.TIME
+      }).setOrigin(0.5);
+
+      const dateText = isMobile ? entry.date.split(' ')[0] : entry.date;
+      this.add.text(dateX, y, dateText, {
+        fontSize: isMobile ? '12px' : fontSize,
+        color: this.COLORS.DATE
+      }).setOrigin(0.5);
     });
 
-    this.add.text(this.scale.width / 2, 700, 'Play more games to improve your high score!', {
-      fontSize: '18px',
-      color: '#87CEEB',
-      fontStyle: 'italic'
-    }).setOrigin(0.5);
+    if (displayScores.length === 0) {
+      this.add.text(screenWidth / 2, startY + 100, 'No high scores yet!\nPlay the game to set your first record!', {
+        fontSize: isMobile ? '18px' : '20px',
+        color: this.COLORS.INFO,
+        fontStyle: 'italic',
+        align: 'center'
+      }).setOrigin(0.5);
+    }
+
+
+    if (allScores.length > scoresToShow && scoresToShow > 0) {
+      const infoY = startY + (scoresToShow * spacing);
+      this.add.text(screenWidth / 2, infoY, `Showing top ${scoresToShow} of ${allScores.length} scores`, {
+        fontSize: isMobile ? '12px' : '14px',
+        color: this.COLORS.INFO,
+        fontStyle: 'italic'
+      }).setOrigin(0.5);
+    }
   }
 
   private getRankColor(rank: number): string {
@@ -113,7 +186,7 @@ export class HighScoreScene extends Phaser.Scene {
       case 3:
         return this.COLORS.BRONZE;
       default:
-        return this.COLORS.WHITE;
+        return this.COLORS.BLACK;
     }
   }
 
