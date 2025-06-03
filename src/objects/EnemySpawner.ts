@@ -82,8 +82,8 @@ export class EnemySpawner {
   }
 
   private setEnemySpawnPosition(enemy: Enemy, direction: SpawnDirection): void {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+    const screenWidth = this.scene.cameras.main.width;
+    const screenHeight = this.scene.cameras.main.height;
 
     switch (direction) {
       case SpawnDirection.LEFT:
@@ -101,6 +101,8 @@ export class EnemySpawner {
         enemy.y = -enemy.height;
         break;
     }
+
+    console.log(enemy.x, enemy.y);
   }
 
   private getRandomSpawnDirection(): SpawnDirection {
