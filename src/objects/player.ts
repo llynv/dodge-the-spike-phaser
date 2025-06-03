@@ -9,9 +9,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private readonly PLAYER_CONFIG = {
     SCALE: 0.5,
     COLLIDER: {
-      WIDTH: 20,
-      HEIGHT: 45,
-      OFFSET: { x: 40, y: 45 }
+      WIDTH: 50,
+      HEIGHT: 190,
+      OFFSET: { x: 60, y: 60 }
     }
   };
 
@@ -40,7 +40,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.health = new PlayerHealth(this);
     this.stateManager = new PlayerStateManager(this);
     this.controller = new PlayerController(this, scene);
-    console.log('PlayerController ', this.controller);
 
     this.stateManager.update(false);
   }
