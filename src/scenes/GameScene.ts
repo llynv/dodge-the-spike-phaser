@@ -27,7 +27,7 @@ export class GameScene extends Phaser.Scene {
   private readonly OPTIONS_BUTTON = {
     POSITION: {
       X_OFFSET: 200,
-      Y: 20,
+      Y: 50,
     },
     SIZE: {
       WIDTH: 100,
@@ -45,8 +45,8 @@ export class GameScene extends Phaser.Scene {
 
   private readonly HEALTH_BAR = {
     POSITION: {
-      X: 20,
-      Y: 80,
+      X: 100,
+      Y: 50,
     },
     SIZE: {
       WIDTH: 200,
