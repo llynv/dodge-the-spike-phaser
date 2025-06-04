@@ -5,6 +5,8 @@ interface TouchButton {
   background: Phaser.GameObjects.Graphics;
   icon: Phaser.GameObjects.Graphics;
   isPressed: boolean;
+  activeTouches: Set<number>;
+  bounds: Phaser.Geom.Rectangle;
 }
 
 export class MobileControls {
@@ -15,10 +17,10 @@ export class MobileControls {
 
   private readonly BUTTON_CONFIG = {
     MOVEMENT: {
-      SIZE: 80,
+      SIZE: 120,
       POSITION_Y_OFFSET: 120,
       LEFT_X_OFFSET: 100,
-      RIGHT_X_OFFSET: 200,
+      RIGHT_X_OFFSET: 300,
       COLORS: {
         BACKGROUND: 0x2c3e50,
         BACKGROUND_PRESSED: 0x34495e,
@@ -27,7 +29,7 @@ export class MobileControls {
       },
     },
     JUMP: {
-      SIZE: 90,
+      SIZE: 120,
       POSITION_Y_OFFSET: 120,
       RIGHT_X_OFFSET: 100,
       COLORS: {
@@ -52,7 +54,7 @@ export class MobileControls {
     this.leftButton = this.createLeftButton();
     this.rightButton = this.createRightButton();
     this.jumpButton = this.createJumpButton();
-    this.setupEventListeners();
+    this.setupGlobalTouchHandling();
   }
 
   private createLeftButton(): TouchButton {
@@ -108,14 +110,17 @@ export class MobileControls {
 
     container.add([background, icon]);
     container.setSize(size, size);
-    container.setInteractive();
     container.setDepth(1000);
+
+    const bounds = new Phaser.Geom.Rectangle(x - size / 2, y - size / 2, size, size);
 
     return {
       container,
       background,
       icon,
       isPressed: false,
+      activeTouches: new Set<number>(),
+      bounds,
     };
   }
 
@@ -151,81 +156,146 @@ export class MobileControls {
     graphics.strokePath();
   }
 
-  private setupEventListeners(): void {
-    this.setupButtonEvents(this.leftButton, 'left');
+  private setupGlobalTouchHandling(): void {
+    this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.handleTouchStart(pointer);
+    });
 
-    this.setupButtonEvents(this.rightButton, 'right');
+    this.scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      this.handleTouchEnd(pointer);
+    });
 
-    this.setupButtonEvents(this.jumpButton, 'jump');
+    this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      this.handleTouchMove(pointer);
+    });
+
+    this.scene.input.on('pointerupoutside', (pointer: Phaser.Input.Pointer) => {
+      this.handleTouchEnd(pointer);
+    });
   }
 
-  private setupButtonEvents(button: TouchButton, buttonType: 'left' | 'right' | 'jump'): void {
-    const colors =
-      buttonType === 'jump' ? this.BUTTON_CONFIG.JUMP.COLORS : this.BUTTON_CONFIG.MOVEMENT.COLORS;
+  private handleTouchStart(pointer: Phaser.Input.Pointer): void {
+    const touchId = pointer.id;
+    const x = pointer.x;
+    const y = pointer.y;
 
-    button.container.on('pointerdown', () => {
-      this.onButtonPress(button, buttonType, colors);
-    });
+    if (this.isPointInButton(x, y, this.leftButton)) {
+      this.onButtonPress(this.leftButton, 'left', this.BUTTON_CONFIG.MOVEMENT.COLORS, touchId);
+    }
 
-    button.container.on('pointerup', () => {
-      this.onButtonRelease(button, buttonType, colors);
-    });
+    if (this.isPointInButton(x, y, this.rightButton)) {
+      this.onButtonPress(this.rightButton, 'right', this.BUTTON_CONFIG.MOVEMENT.COLORS, touchId);
+    }
 
-    button.container.on('pointerout', () => {
-      this.onButtonRelease(button, buttonType, colors);
-    });
+    if (this.isPointInButton(x, y, this.jumpButton)) {
+      this.onButtonPress(this.jumpButton, 'jump', this.BUTTON_CONFIG.JUMP.COLORS, touchId);
+    }
+  }
 
-    button.container.on('touchstart', () => {
-      this.onButtonPress(button, buttonType, colors);
-    });
+  private handleTouchEnd(pointer: Phaser.Input.Pointer): void {
+    const touchId = pointer.id;
 
-    button.container.on('touchend', () => {
-      this.onButtonRelease(button, buttonType, colors);
-    });
+    this.onButtonRelease(this.leftButton, 'left', this.BUTTON_CONFIG.MOVEMENT.COLORS, touchId);
+    this.onButtonRelease(this.rightButton, 'right', this.BUTTON_CONFIG.MOVEMENT.COLORS, touchId);
+    this.onButtonRelease(this.jumpButton, 'jump', this.BUTTON_CONFIG.JUMP.COLORS, touchId);
+  }
 
-    button.container.on('touchcancel', () => {
-      this.onButtonRelease(button, buttonType, colors);
-    });
+  private handleTouchMove(pointer: Phaser.Input.Pointer): void {
+    const touchId = pointer.id;
+    const x = pointer.x;
+    const y = pointer.y;
+
+    this.checkTouchOutOfBounds(
+      x,
+      y,
+      touchId,
+      this.leftButton,
+      'left',
+      this.BUTTON_CONFIG.MOVEMENT.COLORS
+    );
+    this.checkTouchOutOfBounds(
+      x,
+      y,
+      touchId,
+      this.rightButton,
+      'right',
+      this.BUTTON_CONFIG.MOVEMENT.COLORS
+    );
+    this.checkTouchOutOfBounds(
+      x,
+      y,
+      touchId,
+      this.jumpButton,
+      'jump',
+      this.BUTTON_CONFIG.JUMP.COLORS
+    );
+  }
+
+  private checkTouchOutOfBounds(
+    x: number,
+    y: number,
+    touchId: number,
+    button: TouchButton,
+    buttonType: 'left' | 'right' | 'jump',
+    colors: any
+  ): void {
+    if (button.activeTouches.has(touchId) && !this.isPointInButton(x, y, button)) {
+      this.onButtonRelease(button, buttonType, colors, touchId);
+    }
+  }
+
+  private isPointInButton(x: number, y: number, button: TouchButton): boolean {
+    return Phaser.Geom.Rectangle.Contains(button.bounds, x, y);
   }
 
   private onButtonPress(
     button: TouchButton,
     buttonType: 'left' | 'right' | 'jump',
-    colors: any
+    colors: any,
+    touchId: number
   ): void {
-    button.isPressed = true;
+    button.activeTouches.add(touchId);
 
-    this.updateButtonStyle({
-      button,
-      backgroundColor: colors.BACKGROUND_PRESSED,
-      borderColor: colors.BORDER,
-      size: buttonType === 'jump' ? this.BUTTON_CONFIG.JUMP.SIZE : this.BUTTON_CONFIG.MOVEMENT.SIZE,
-      opacity: this.BUTTON_CONFIG.OPACITY.PRESSED,
-    });
+    if (!button.isPressed) {
+      button.isPressed = true;
 
-    button.container.setScale(0.95);
+      this.updateButtonStyle({
+        button,
+        backgroundColor: colors.BACKGROUND_PRESSED,
+        borderColor: colors.BORDER,
+        size:
+          buttonType === 'jump' ? this.BUTTON_CONFIG.JUMP.SIZE : this.BUTTON_CONFIG.MOVEMENT.SIZE,
+        opacity: this.BUTTON_CONFIG.OPACITY.PRESSED,
+      });
 
-    this.updateButtonState(buttonType, true);
+      button.container.setScale(0.95);
+      this.updateButtonState(buttonType, true);
+    }
   }
 
   private onButtonRelease(
     button: TouchButton,
     buttonType: 'left' | 'right' | 'jump',
-    colors: any
+    colors: any,
+    touchId: number
   ): void {
-    button.isPressed = false;
+    button.activeTouches.delete(touchId);
 
-    this.updateButtonStyle({
-      button,
-      backgroundColor: colors.BACKGROUND,
-      borderColor: colors.BORDER,
-      size: buttonType === 'jump' ? this.BUTTON_CONFIG.JUMP.SIZE : this.BUTTON_CONFIG.MOVEMENT.SIZE,
-      opacity: this.BUTTON_CONFIG.OPACITY.NORMAL,
-    });
+    if (button.activeTouches.size === 0 && button.isPressed) {
+      button.isPressed = false;
 
-    button.container.setScale(1.0);
+      this.updateButtonStyle({
+        button,
+        backgroundColor: colors.BACKGROUND,
+        borderColor: colors.BORDER,
+        size:
+          buttonType === 'jump' ? this.BUTTON_CONFIG.JUMP.SIZE : this.BUTTON_CONFIG.MOVEMENT.SIZE,
+        opacity: this.BUTTON_CONFIG.OPACITY.NORMAL,
+      });
 
-    this.updateButtonState(buttonType, false);
+      button.container.setScale(1.0);
+      this.updateButtonState(buttonType, false);
+    }
   }
 
   private updateButtonStyle({
@@ -246,8 +316,6 @@ export class MobileControls {
     button.background.lineStyle(3, borderColor, 1);
     button.background.fillCircle(0, 0, size / 2);
     button.background.strokeCircle(0, 0, size / 2);
-
-    button.container.setScale(1.0);
   }
 
   private updateButtonState(buttonType: 'left' | 'right' | 'jump', pressed: boolean): void {
@@ -265,20 +333,23 @@ export class MobileControls {
   }
 
   private updateButtonPositions(): void {
-    this.leftButton.container.setPosition(
-      this.BUTTON_CONFIG.MOVEMENT.LEFT_X_OFFSET,
-      this.scene.cameras.main.height - this.BUTTON_CONFIG.MOVEMENT.POSITION_Y_OFFSET
-    );
+    const leftX = this.BUTTON_CONFIG.MOVEMENT.LEFT_X_OFFSET;
+    const leftY = this.scene.cameras.main.height - this.BUTTON_CONFIG.MOVEMENT.POSITION_Y_OFFSET;
+    const rightX = this.BUTTON_CONFIG.MOVEMENT.RIGHT_X_OFFSET;
+    const rightY = this.scene.cameras.main.height - this.BUTTON_CONFIG.MOVEMENT.POSITION_Y_OFFSET;
+    const jumpX = this.scene.cameras.main.width - this.BUTTON_CONFIG.JUMP.RIGHT_X_OFFSET;
+    const jumpY = this.scene.cameras.main.height - this.BUTTON_CONFIG.JUMP.POSITION_Y_OFFSET;
 
-    this.rightButton.container.setPosition(
-      this.BUTTON_CONFIG.MOVEMENT.RIGHT_X_OFFSET,
-      this.scene.cameras.main.height - this.BUTTON_CONFIG.MOVEMENT.POSITION_Y_OFFSET
-    );
+    this.leftButton.container.setPosition(leftX, leftY);
+    this.rightButton.container.setPosition(rightX, rightY);
+    this.jumpButton.container.setPosition(jumpX, jumpY);
 
-    this.jumpButton.container.setPosition(
-      this.scene.cameras.main.width - this.BUTTON_CONFIG.JUMP.RIGHT_X_OFFSET,
-      this.scene.cameras.main.height - this.BUTTON_CONFIG.JUMP.POSITION_Y_OFFSET
-    );
+    const leftSize = this.BUTTON_CONFIG.MOVEMENT.SIZE;
+    const jumpSize = this.BUTTON_CONFIG.JUMP.SIZE;
+
+    this.leftButton.bounds.setTo(leftX - leftSize / 2, leftY - leftSize / 2, leftSize, leftSize);
+    this.rightButton.bounds.setTo(rightX - leftSize / 2, rightY - leftSize / 2, leftSize, leftSize);
+    this.jumpButton.bounds.setTo(jumpX - jumpSize / 2, jumpY - jumpSize / 2, jumpSize, jumpSize);
   }
 
   public setVisible(visible: boolean): void {
@@ -288,6 +359,11 @@ export class MobileControls {
   }
 
   public destroy(): void {
+    this.scene.input.off('pointerdown');
+    this.scene.input.off('pointerup');
+    this.scene.input.off('pointermove');
+    this.scene.input.off('pointerupoutside');
+
     this.leftButton.container.destroy();
     this.rightButton.container.destroy();
     this.jumpButton.container.destroy();
