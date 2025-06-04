@@ -9,7 +9,7 @@ export class OptionsScene extends Phaser.Scene {
       TEXT: 'Resume Game',
       BACKGROUND_COLOR: '#34495e',
       HOVER_COLOR: '#2c3e50',
-      TEXT_COLOR: '#ffffff'
+      TEXT_COLOR: '#ffffff',
     },
     RESTART: {
       WIDTH: 200,
@@ -17,7 +17,7 @@ export class OptionsScene extends Phaser.Scene {
       TEXT: 'Restart Game',
       BACKGROUND_COLOR: '#3498db',
       HOVER_COLOR: '#2980b9',
-      TEXT_COLOR: '#ffffff'
+      TEXT_COLOR: '#ffffff',
     },
     BACK: {
       WIDTH: 200,
@@ -25,8 +25,8 @@ export class OptionsScene extends Phaser.Scene {
       TEXT: 'Back to Menu',
       BACKGROUND_COLOR: '#e74c3c',
       HOVER_COLOR: '#c0392b',
-      TEXT_COLOR: '#ffffff'
-    }
+      TEXT_COLOR: '#ffffff',
+    },
   };
 
   private optionsBackground!: Phaser.GameObjects.Rectangle;
@@ -59,30 +59,35 @@ export class OptionsScene extends Phaser.Scene {
   private createOptionsMenu(): void {
     this.optionsMenu = this.add.container(this.scale.width / 2, this.scale.height / 2);
 
-    const title = this.add.text(0, -120, 'GAME PAUSED', {
-      fontSize: '32px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      stroke: 'rgba(0, 0, 0, 0.8)',
-      strokeThickness: 3
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(0, -120, 'GAME PAUSED', {
+        fontSize: '32px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        stroke: 'rgba(0, 0, 0, 0.8)',
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5);
 
     const resumeButton = this.createMenuButton(
-      0, -30,
+      0,
+      -30,
       this.MENU_BUTTONS.RESUME.TEXT,
       this.MENU_BUTTONS.RESUME,
       () => this.resumeGame()
     );
 
     const restartButton = this.createMenuButton(
-      0, 40,
+      0,
+      40,
       this.MENU_BUTTONS.RESTART.TEXT,
       this.MENU_BUTTONS.RESTART,
       () => this.restartGame()
     );
 
     const backButton = this.createMenuButton(
-      0, 110,
+      0,
+      110,
       this.MENU_BUTTONS.BACK.TEXT,
       this.MENU_BUTTONS.BACK,
       () => this.backToMenu()
@@ -92,21 +97,30 @@ export class OptionsScene extends Phaser.Scene {
     this.optionsMenu.setDepth(1001);
   }
 
-  private createMenuButton(x: number, y: number, text: string, config: any, onClick: () => void): Phaser.GameObjects.Container {
+  private createMenuButton(
+    x: number,
+    y: number,
+    text: string,
+    config: any,
+    onClick: () => void
+  ): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
 
     const bg = this.add.rectangle(
-      0, 0,
+      0,
+      0,
       config.WIDTH,
       config.HEIGHT,
       Phaser.Display.Color.HexStringToColor(config.BACKGROUND_COLOR).color
     );
 
-    const buttonText = this.add.text(0, 0, text, {
-      fontSize: '18px',
-      color: config.TEXT_COLOR,
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const buttonText = this.add
+      .text(0, 0, text, {
+        fontSize: '18px',
+        color: config.TEXT_COLOR,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     button.add([bg, buttonText]);
     button.setSize(config.WIDTH, config.HEIGHT);

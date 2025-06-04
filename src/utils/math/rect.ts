@@ -7,7 +7,7 @@ export class Rect {
     public y: number = 0,
     public width: number = 0,
     public height: number = 0
-  ) { }
+  ) {}
 
   /**
    * Get the left edge of the rectangle
@@ -41,12 +41,7 @@ export class Rect {
    * Check if this rectangle contains a point
    */
   contains(x: number, y: number): boolean {
-    return (
-      x >= this.x &&
-      x <= this.x + this.width &&
-      y >= this.y &&
-      y <= this.y + this.height
-    );
+    return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
   }
 
   /**
@@ -75,4 +70,3 @@ export class Rect {
     return `Rect(${this.x}, ${this.y}, ${this.width}, ${this.height})`;
   }
 }
-

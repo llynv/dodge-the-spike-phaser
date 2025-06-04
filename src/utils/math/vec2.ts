@@ -2,7 +2,7 @@
  * 2D Vector class for representing points, positions, velocities, etc.
  */
 export class Vec2 {
-  constructor(public x: number = 0, public y: number = 0) { }
+  constructor(public x: number = 0, public y: number = 0) {}
 
   /**
    * Create a new Vec2 with the same values
@@ -88,7 +88,6 @@ export class Vec2 {
     return new Vec2(this.x + direction.x * scale, this.y + direction.y * scale);
   }
 
-
   /**
    * Create a Vec2 from an angle in radians
    * @param angle Angle in radians
@@ -135,7 +134,7 @@ export class Vec2 {
 
     const sqDist = toVectorX * toVectorX + toVectorY * toVectorY;
 
-    if (sqDist === 0 || maxDistanceDelta >= 0 && sqDist <= maxDistanceDelta * maxDistanceDelta) {
+    if (sqDist === 0 || (maxDistanceDelta >= 0 && sqDist <= maxDistanceDelta * maxDistanceDelta)) {
       return new Vec2(target.x, target.y);
     }
 

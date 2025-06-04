@@ -1,10 +1,10 @@
-import { Vec2 } from "./vec2";
+import { Vec2 } from './vec2';
 
 /**
  * 3D Vector class for representing points, positions, etc.
  */
 export class Vec3 {
-  constructor(public x: number = 0, public y: number = 0, public z: number = 0) { }
+  constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
 
   /**
    * Create a new Vec3 with the same values
@@ -143,7 +143,7 @@ export class Vec3 {
 
     const sqDist = toVectorX * toVectorX + toVectorY * toVectorY + toVectorZ * toVectorZ;
 
-    if (sqDist === 0 || maxDistanceDelta >= 0 && sqDist <= maxDistanceDelta * maxDistanceDelta) {
+    if (sqDist === 0 || (maxDistanceDelta >= 0 && sqDist <= maxDistanceDelta * maxDistanceDelta)) {
       return new Vec3(target.x, target.y, target.z);
     }
 
