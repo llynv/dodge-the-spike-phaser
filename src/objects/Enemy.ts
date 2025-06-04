@@ -170,14 +170,53 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.y < -buffer ||
       this.y > screenHeight + buffer
     ) {
-      this.returnToPool();
+      this.returnToPoolSilently();
     }
   }
 
   public returnToPool(): void {
+    this.returnToPoolWithExplosion();
+  }
+
+  public returnToPoolWithExplosion(): void {
+    if (this.isActive) {
+      this.createExplosion();
+      this.reset();
+      this.scene.events.emit('enemy-return-to-pool', this);
+    }
+  }
+
+  public returnToPoolSilently(): void {
     if (this.isActive) {
       this.reset();
       this.scene.events.emit('enemy-return-to-pool', this);
+    }
+  }
+
+  private createExplosion(): void {
+    const explosion = this.scene.add.sprite(this.x, this.y, 'enemy_explode');
+
+    const explosionScale = this.scale * 1.2;
+    explosion.setScale(explosionScale);
+
+    explosion.setDepth(1000);
+
+    explosion.play('enemy_explode');
+
+    explosion.on('animationcomplete', () => {
+      explosion.destroy();
+    });
+
+    this.scene.time.delayedCall(1000, () => {
+      if (explosion && explosion.active) {
+        explosion.destroy();
+      }
+    });
+  }
+
+  public explodeAndReturnToPool(): void {
+    if (this.isActive) {
+      this.returnToPoolWithExplosion();
     }
   }
 
@@ -218,7 +257,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public override destroy(fromScene?: boolean): void {
     if (this.isActive) {
-      this.returnToPool();
+      this.explodeAndReturnToPool();
     }
   }
 }

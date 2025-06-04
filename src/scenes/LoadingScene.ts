@@ -82,9 +82,13 @@ export class LoadingScene extends Phaser.Scene {
       frameWidth: 155,
       frameHeight: 280,
     });
-    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/enemy_fire.png', {
+    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/fire/enemy_fire.png', {
       frameWidth: 48,
       frameHeight: 48,
+    });
+    this.load.spritesheet('enemy_explode', 'assets/animations/enemy/explode/enemy_explode.png', {
+      frameWidth: 32,
+      frameHeight: 32,
     });
 
     this.load.on('loaderror', (file: any) => {
@@ -100,6 +104,8 @@ export class LoadingScene extends Phaser.Scene {
     this.createAnimation('player_run', 'player_run', 20, -1);
 
     this.createAnimation('player_fall', 'player_jump', 8, -1, true);
+
+    this.createAnimation('enemy_explode', 'enemy_explode', 6, -1);
 
     this.createAnimation('enemy_fire', 'enemy_fire', 12, -1, false, 8);
   }
