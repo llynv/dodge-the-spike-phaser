@@ -6,7 +6,7 @@ export class PlayerController {
     MASS: 3,
     MOVE_ACCELERATION: 40000,
     MAX_MOVE_SPEED: 300,
-    JUMP_IMPULSE: 350
+    JUMP_IMPULSE: 350,
   };
 
   private sprite: Phaser.Physics.Arcade.Sprite;
@@ -16,10 +16,16 @@ export class PlayerController {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private spaceKey!: Phaser.Input.Keyboard.Key;
   private wasdKeys!: {
-    up: Phaser.Input.Keyboard.Key,
-    left: Phaser.Input.Keyboard.Key,
-    down: Phaser.Input.Keyboard.Key,
-    right: Phaser.Input.Keyboard.Key
+    up: Phaser.Input.Keyboard.Key;
+    left: Phaser.Input.Keyboard.Key;
+    down: Phaser.Input.Keyboard.Key;
+    right: Phaser.Input.Keyboard.Key;
+  };
+
+  private mobileControls = {
+    leftPressed: false,
+    rightPressed: false,
+    jumpPressed: false,
   };
 
   constructor(sprite: Phaser.Physics.Arcade.Sprite, scene: Phaser.Scene) {
@@ -37,10 +43,10 @@ export class PlayerController {
     this.cursors = scene.input.keyboard!.createCursorKeys();
     this.spaceKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.wasdKeys = scene.input.keyboard!.addKeys('W,S,A,D') as {
-      up: Phaser.Input.Keyboard.Key,
-      down: Phaser.Input.Keyboard.Key,
-      left: Phaser.Input.Keyboard.Key,
-      right: Phaser.Input.Keyboard.Key
+      up: Phaser.Input.Keyboard.Key;
+      down: Phaser.Input.Keyboard.Key;
+      left: Phaser.Input.Keyboard.Key;
+      right: Phaser.Input.Keyboard.Key;
     };
   }
 
@@ -58,10 +64,16 @@ export class PlayerController {
 
     this.moveDir = 0;
 
-    if (this.cursors.left?.isDown || this.wasdKeys.left?.isDown) {
+    const leftKeyPressed = this.cursors.left?.isDown || this.wasdKeys.left?.isDown;
+    const rightKeyPressed = this.cursors.right?.isDown || this.wasdKeys.right?.isDown;
+
+    const leftPressed = leftKeyPressed || this.mobileControls.leftPressed;
+    const rightPressed = rightKeyPressed || this.mobileControls.rightPressed;
+
+    if (leftPressed) {
       this.moveDir = -1;
       this.isReversed = true;
-    } else if (this.cursors.right?.isDown || this.wasdKeys.right?.isDown) {
+    } else if (rightPressed) {
       this.moveDir = 1;
       this.isReversed = false;
     }
@@ -70,10 +82,7 @@ export class PlayerController {
       const acceleration = this.moveDir * this.PHYSICS_CONFIG.MOVE_ACCELERATION * deltaTime;
       body.setVelocityX(body.velocity.x + acceleration);
 
-      const limitedSpeed = Math.min(
-        Math.abs(body.velocity.x),
-        this.PHYSICS_CONFIG.MAX_MOVE_SPEED
-      );
+      const limitedSpeed = Math.min(Math.abs(body.velocity.x), this.PHYSICS_CONFIG.MAX_MOVE_SPEED);
       body.setVelocityX(limitedSpeed * Math.sign(body.velocity.x));
     } else {
       body.setVelocityX(body.velocity.x * 0.8);
@@ -83,11 +92,26 @@ export class PlayerController {
   private handleJump(): void {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
 
-    const jumpPressed = this.cursors.up?.isDown || this.wasdKeys.up?.isDown || this.spaceKey?.isDown;
+    const keyboardJumpPressed =
+      this.cursors.up?.isDown || this.wasdKeys.up?.isDown || this.spaceKey?.isDown;
+
+    const jumpPressed = keyboardJumpPressed || this.mobileControls.jumpPressed;
 
     if (!jumpPressed) return;
 
     body.setVelocityY(-this.PHYSICS_CONFIG.JUMP_IMPULSE);
+  }
+
+  public setMobileLeftPressed(pressed: boolean): void {
+    this.mobileControls.leftPressed = pressed;
+  }
+
+  public setMobileRightPressed(pressed: boolean): void {
+    this.mobileControls.rightPressed = pressed;
+  }
+
+  public setMobileJumpPressed(pressed: boolean): void {
+    this.mobileControls.jumpPressed = pressed;
   }
 
   public getVelocity(): { x: number; y: number } {
