@@ -53,6 +53,9 @@ const config: Phaser.Types.Core.GameConfig = {
   height: dimensions.height,
   parent: 'phaser-game',
   backgroundColor: '#87CEEB',
+  input: {
+    activePointers: 5,
+  },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

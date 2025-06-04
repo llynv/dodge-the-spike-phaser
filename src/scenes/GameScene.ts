@@ -213,6 +213,7 @@ export class GameScene extends Phaser.Scene {
   private createEnemySpawner(): void {
     this.enemySpawner = new EnemySpawner(this);
     this.enemySpawner.setPlayer(this.player);
+    this.enemySpawner.setPlatforms(this.platforms);
   }
 
   private createTimer(): void {
@@ -405,6 +406,16 @@ export class GameScene extends Phaser.Scene {
   private setupCollisions(): void {
     this.physics.add.collider(this.player, this.platforms);
 
+    this.physics.add.overlap(this.enemySpawner.getEnemies(), this.platforms, enemy => {
+      const enemySprite = enemy as Enemy;
+
+      if (!enemySprite.getIsActive() || !enemySprite.visible || !enemySprite.active) {
+        return;
+      }
+
+      enemySprite.returnToPool();
+    });
+
     this.physics.add.overlap(this.player, this.enemySpawner.getEnemies(), (player, enemy) => {
       const playerSprite = player as Player;
       const enemySprite = enemy as Enemy;
@@ -414,6 +425,7 @@ export class GameScene extends Phaser.Scene {
       }
 
       const died = playerSprite.takeDamage(enemySprite.getDamage());
+
       if (!died) {
         enemySprite.returnToPool();
       }

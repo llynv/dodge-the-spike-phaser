@@ -129,8 +129,6 @@ export class LoadingScene extends Phaser.Scene {
         });
       }
 
-      console.log(`Creating animation ${animKey} with ${frames.length} frames`);
-
       this.anims.create({
         key: animKey,
         frames: frames,
