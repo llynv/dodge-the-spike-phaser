@@ -37,7 +37,6 @@ export class GameOverScene extends Phaser.Scene {
     this.createGameOverUI();
     this.saveScore();
 
-    this.scene.get('GameScene').scene.pause();
     GameManager.getInstance().setIsGameOver(true);
   }
 
