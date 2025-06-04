@@ -1,65 +1,56 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import webpack from 'webpack';
-import 'webpack-dev-server';
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const config: webpack.Configuration = {
+module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: './main.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js',
-    clean: true
+    clean: true,
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
         include: path.resolve(__dirname, 'src'),
-        loader: 'ts-loader'
+        loader: 'ts-loader',
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   devServer: {
     static: [
       {
-        directory: path.join(__dirname, 'dist')
+        directory: path.join(__dirname, 'dist'),
       },
       {
         directory: path.join(__dirname, 'assets'),
-        publicPath: '/assets'
-      }
-    ]
+        publicPath: '/assets',
+      },
+    ],
   },
   resolve: {
-    extensions: ['.ts', '.js', '.css']
+    extensions: ['.ts', '.js', '.css'],
   },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
         {
           from: path.resolve(__dirname, 'assets'),
-          to: 'assets'
-        }
-      ]
+          to: 'assets',
+        },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'index.html'),
       title: 'Dodge the Spike',
-      inject: 'head'
-    })
-  ]
+      inject: 'head',
+    }),
+  ],
 };
-
-export default config;
