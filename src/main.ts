@@ -20,7 +20,7 @@ function getGameDimensions() {
       minWidth: 640,
       minHeight: 360,
       maxWidth: 2560,
-      maxHeight: 1440
+      maxHeight: 1440,
     };
   } else {
     return {
@@ -29,7 +29,7 @@ function getGameDimensions() {
       minWidth: 360,
       minHeight: 640,
       maxWidth: 1440,
-      maxHeight: 2560
+      maxHeight: 2560,
     };
   }
 }
@@ -39,11 +39,10 @@ const dimensions = getGameDimensions();
 const bootstrapper = new ServiceBootstrapper();
 const serviceConfig: ServiceConfig = {
   storage: {
-    type: 'localStorage'
-  }
+    type: 'localStorage',
+  },
 };
 bootstrapper.initializeServices(serviceConfig);
-
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -58,21 +57,21 @@ const config: Phaser.Types.Core.GameConfig = {
     height: dimensions.height,
     min: {
       width: dimensions.minWidth,
-      height: dimensions.minHeight
+      height: dimensions.minHeight,
     },
     max: {
       width: dimensions.maxWidth,
-      height: dimensions.maxHeight
-    }
+      height: dimensions.maxHeight,
+    },
   },
   physics: {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 1000 },
-      debug: true
-    }
+      debug: true,
+    },
   },
-  scene: [LoadingScene, StartScene, GameScene, HighScoreScene, OptionsScene, GameOverScene]
+  scene: [LoadingScene, StartScene, GameScene, HighScoreScene, OptionsScene, GameOverScene],
 };
 
 const game = new Phaser.Game(config);

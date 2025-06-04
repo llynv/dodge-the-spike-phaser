@@ -8,7 +8,7 @@ export class StartScene extends Phaser.Scene {
     Y_POSITION: 100,
     FONT_SIZE: 40,
     FONT_FAMILY: 'Arial',
-    TEXT: 'DODGE THE SPIKE'
+    TEXT: 'DODGE THE SPIKE',
   };
 
   private readonly START_BUTTON = {
@@ -19,7 +19,7 @@ export class StartScene extends Phaser.Scene {
     TEXT: 'START GAME',
     NORMAL_COLOR: '#4CAF50',
     HOVER_COLOR: '#45a049',
-    TEXT_COLOR: '#ffffff'
+    TEXT_COLOR: '#ffffff',
   };
 
   private readonly HIGH_SCORES_BUTTON = {
@@ -27,7 +27,7 @@ export class StartScene extends Phaser.Scene {
     HEIGHT: 80,
     X_OFFSET: 150,
     Y_OFFSET: 100,
-    TEXT: 'HIGH SCORES'
+    TEXT: 'HIGH SCORES',
   };
 
   private readonly CREDITS = {
@@ -38,13 +38,13 @@ export class StartScene extends Phaser.Scene {
     FONT_SIZE: 14,
     FONT_FAMILY: 'Arial',
     TEXT: '© 2025 Dodge The Spike',
-    BACKGROUND_ALPHA: 0.5
+    BACKGROUND_ALPHA: 0.5,
   };
 
   private readonly COLORS = {
     FALLBACK_BACKGROUND: '#333333',
     WHITE: 'white',
-    TRANSPARENT_BLACK: 'rgba(0, 0, 0, 0.5)'
+    TRANSPARENT_BLACK: 'rgba(0, 0, 0, 0.5)',
   };
 
   constructor() {
@@ -72,11 +72,8 @@ export class StartScene extends Phaser.Scene {
   }
 
   private createTitle(): void {
-    this.add.text(
-      this.scale.width / 2,
-      this.TITLE.Y_POSITION + this.TITLE.HEIGHT / 2,
-      this.TITLE.TEXT,
-      {
+    this.add
+      .text(this.scale.width / 2, this.TITLE.Y_POSITION + this.TITLE.HEIGHT / 2, this.TITLE.TEXT, {
         fontSize: `${this.TITLE.FONT_SIZE}px`,
         color: this.COLORS.WHITE,
         fontFamily: this.TITLE.FONT_FAMILY,
@@ -89,10 +86,10 @@ export class StartScene extends Phaser.Scene {
           color: 'rgba(0, 0, 0, 0.8)',
           blur: 4,
           stroke: true,
-          fill: true
-        }
-      }
-    ).setOrigin(0.5);
+          fill: true,
+        },
+      })
+      .setOrigin(0.5);
   }
 
   private createStartButton(): void {
@@ -102,17 +99,20 @@ export class StartScene extends Phaser.Scene {
     );
 
     const bg = this.add.rectangle(
-      0, 0,
+      0,
+      0,
       this.START_BUTTON.WIDTH,
       this.START_BUTTON.HEIGHT,
       Phaser.Display.Color.HexStringToColor(this.START_BUTTON.NORMAL_COLOR).color
     );
 
-    const text = this.add.text(0, 0, this.START_BUTTON.TEXT, {
-      fontSize: '24px',
-      color: this.START_BUTTON.TEXT_COLOR,
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const text = this.add
+      .text(0, 0, this.START_BUTTON.TEXT, {
+        fontSize: '24px',
+        color: this.START_BUTTON.TEXT_COLOR,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     button.add([bg, text]);
     button.setSize(this.START_BUTTON.WIDTH, this.START_BUTTON.HEIGHT);
@@ -145,17 +145,20 @@ export class StartScene extends Phaser.Scene {
     );
 
     const bg = this.add.rectangle(
-      0, 0,
+      0,
+      0,
       this.HIGH_SCORES_BUTTON.WIDTH,
       this.HIGH_SCORES_BUTTON.HEIGHT,
       Phaser.Display.Color.HexStringToColor(this.START_BUTTON.NORMAL_COLOR).color
     );
 
-    const text = this.add.text(0, 0, this.HIGH_SCORES_BUTTON.TEXT, {
-      fontSize: '24px',
-      color: this.START_BUTTON.TEXT_COLOR,
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const text = this.add
+      .text(0, 0, this.HIGH_SCORES_BUTTON.TEXT, {
+        fontSize: '24px',
+        color: this.START_BUTTON.TEXT_COLOR,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     button.add([bg, text]);
     button.setSize(this.HIGH_SCORES_BUTTON.WIDTH, this.HIGH_SCORES_BUTTON.HEIGHT);
@@ -193,15 +196,12 @@ export class StartScene extends Phaser.Scene {
       this.CREDITS.BACKGROUND_ALPHA
     );
 
-    this.add.text(
-      this.scale.width / 2,
-      creditsY,
-      this.CREDITS.TEXT,
-      {
+    this.add
+      .text(this.scale.width / 2, creditsY, this.CREDITS.TEXT, {
         fontSize: `${this.CREDITS.FONT_SIZE}px`,
         color: this.COLORS.WHITE,
-        fontFamily: this.CREDITS.FONT_FAMILY
-      }
-    ).setOrigin(0.5);
+        fontFamily: this.CREDITS.FONT_FAMILY,
+      })
+      .setOrigin(0.5);
   }
 }

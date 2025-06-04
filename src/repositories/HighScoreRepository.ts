@@ -5,7 +5,6 @@ import { Storage } from '../interface/storage';
  * Provides browser localStorage functionality with consistent async API
  */
 export class HighScoreRepository implements Storage {
-
   async get<T>(key: string): Promise<T | null> {
     try {
       const value = localStorage.getItem(key);
@@ -25,7 +24,9 @@ export class HighScoreRepository implements Storage {
       localStorage.setItem(key, serializedValue);
     } catch (error) {
       console.error(`Error setting item in localStorage (key: ${key}):`, error);
-      throw new Error(`Failed to store data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to store data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -34,7 +35,9 @@ export class HighScoreRepository implements Storage {
       localStorage.removeItem(key);
     } catch (error) {
       console.error(`Error removing item from localStorage (key: ${key}):`, error);
-      throw new Error(`Failed to remove data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to remove data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -52,7 +55,9 @@ export class HighScoreRepository implements Storage {
       localStorage.clear();
     } catch (error) {
       console.error('Error clearing localStorage:', error);
-      throw new Error(`Failed to clear storage: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to clear storage: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }

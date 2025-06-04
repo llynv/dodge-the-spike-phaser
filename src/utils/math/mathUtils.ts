@@ -97,10 +97,7 @@ export class MathUtils {
    * @returns Random Vec2
    */
   static randomVec2(minX: number, maxX: number, minY: number, maxY: number): Vec2 {
-    return new Vec2(
-      MathUtils.random(minX, maxX),
-      MathUtils.random(minY, maxY)
-    );
+    return new Vec2(MathUtils.random(minX, maxX), MathUtils.random(minY, maxY));
   }
 
   /**
@@ -149,7 +146,13 @@ export class MathUtils {
    * @param toMax Output maximum
    * @returns Mapped value
    */
-  static map(value: number, fromMin: number, fromMax: number, toMin: number, toMax: number): number {
+  static map(
+    value: number,
+    fromMin: number,
+    fromMax: number,
+    toMin: number,
+    toMax: number
+  ): number {
     return toMin + (toMax - toMin) * ((value - fromMin) / (fromMax - fromMin));
   }
 

@@ -1,4 +1,4 @@
-import { StorageConfig } from "./storageConfig";
+import { StorageConfig } from './storageConfig';
 
 export interface ServiceConfig {
   storage?: StorageConfig;

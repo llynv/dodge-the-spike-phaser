@@ -5,7 +5,7 @@ export class HighScoreService {
   private static readonly STORAGE_KEY = 'gameHighScore';
   private static readonly MAX_SCORES = 10;
 
-  constructor(private readonly storage: Storage) { }
+  constructor(private readonly storage: Storage) {}
 
   public async getHighScores(): Promise<ScoreEntry[]> {
     try {
@@ -32,7 +32,7 @@ export class HighScoreService {
       const newScore: ScoreEntry = {
         score: score,
         time: timeFormatted,
-        date: new Date().toLocaleDateString()
+        date: new Date().toLocaleDateString(),
       };
 
       scores.push(newScore);
@@ -48,10 +48,8 @@ export class HighScoreService {
 
       await this.storage.set(HighScoreService.STORAGE_KEY, topScores);
 
-      return topScores.some(s =>
-        s.score === newScore.score &&
-        s.time === newScore.time &&
-        s.date === newScore.date
+      return topScores.some(
+        s => s.score === newScore.score && s.time === newScore.time && s.date === newScore.date
       );
     } catch (error) {
       console.error('Error saving high score:', error);

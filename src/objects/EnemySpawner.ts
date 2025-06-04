@@ -18,11 +18,15 @@ export class EnemySpawner {
     DIFFICULTY_INCREASE_INTERVAL: 10000,
   };
 
-  private spawnDirections: SpawnDirection[] = [SpawnDirection.LEFT, SpawnDirection.RIGHT, SpawnDirection.TOP];
+  private spawnDirections: SpawnDirection[] = [
+    SpawnDirection.LEFT,
+    SpawnDirection.RIGHT,
+    SpawnDirection.TOP,
+  ];
   private enemyTypeWeights: Record<EnemyType, number> = {
     [EnemyType.BASIC]: 70,
     [EnemyType.FAST]: 20,
-    [EnemyType.TANK]: 10
+    [EnemyType.TANK]: 10,
   };
 
   private currentSpawnRate: number;
@@ -52,7 +56,10 @@ export class EnemySpawner {
 
       this.spawnTimer = 0;
 
-      this.currentSpawnRate = Math.max(this.CONFIG.MIN_SPAWN_RATE, this.currentSpawnRate - this.CONFIG.SPAWN_RATE_DECREASE);
+      this.currentSpawnRate = Math.max(
+        this.CONFIG.MIN_SPAWN_RATE,
+        this.currentSpawnRate - this.CONFIG.SPAWN_RATE_DECREASE
+      );
     }
   }
 
@@ -90,19 +97,19 @@ export class EnemySpawner {
       case SpawnDirection.LEFT:
         return {
           x: -enemySize,
-          y: MathUtils.random(enemySize, screenHeight - enemySize)
+          y: MathUtils.random(enemySize, screenHeight - enemySize),
         };
 
       case SpawnDirection.RIGHT:
         return {
           x: screenWidth + enemySize,
-          y: MathUtils.random(enemySize, screenHeight - enemySize)
+          y: MathUtils.random(enemySize, screenHeight - enemySize),
         };
 
       case SpawnDirection.TOP:
         return {
           x: MathUtils.random(enemySize, screenWidth - enemySize),
-          y: -enemySize
+          y: -enemySize,
         };
 
       default:

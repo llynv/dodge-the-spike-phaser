@@ -5,13 +5,13 @@ import { Vec2 } from '../utils/math/vec2';
 export enum SpawnDirection {
   LEFT = 'left',
   RIGHT = 'right',
-  TOP = 'top'
+  TOP = 'top',
 }
 
 export enum EnemyType {
   BASIC = 'basic',
   FAST = 'fast',
-  TANK = 'tank'
+  TANK = 'tank',
 }
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -21,22 +21,22 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       SPEED: 150,
       DAMAGE: 25,
       COLOR: 0xff4444,
-      HEALTH: 1
+      HEALTH: 1,
     },
     FAST: {
       SCALE: 1.0,
       SPEED: 300,
       DAMAGE: 15,
       COLOR: 0xff8844,
-      HEALTH: 1
+      HEALTH: 1,
     },
     TANK: {
       SCALE: 2.0,
       SPEED: 75,
       DAMAGE: 50,
       COLOR: 0x884444,
-      HEALTH: 2
-    }
+      HEALTH: 2,
+    },
   };
 
   private enemyType: EnemyType = EnemyType.BASIC;
@@ -48,7 +48,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private baseDirection: Vec2 = Vec2.Zero;
   private isActive: boolean = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, type?: EnemyType, spawnDirection?: SpawnDirection) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    type?: EnemyType,
+    spawnDirection?: SpawnDirection
+  ) {
     super(scene, x, y, 'enemy');
 
     this.play('enemy_fire');
@@ -123,7 +129,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   private handleSpriteOrientation(): void {
-    if (this.spawnDirection === SpawnDirection.RIGHT || (this.spawnDirection === SpawnDirection.TOP && this.x > this.targetX)) {
+    if (
+      this.spawnDirection === SpawnDirection.RIGHT ||
+      (this.spawnDirection === SpawnDirection.TOP && this.x > this.targetX)
+    ) {
       this.setFlipY(true);
     } else {
       this.setFlipY(false);
@@ -131,17 +140,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override update(time: number, delta: number): void {
-    if (!this.isActive || !this.visible || GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
+    if (
+      !this.isActive ||
+      !this.visible ||
+      GameManager.getInstance().getIsPaused() ||
+      GameManager.getInstance().getIsGameOver()
+    ) {
       return;
     }
 
     const direction = this.getDirection();
     this.body?.velocity.set(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
 
-    this.rotation = Math.atan2(
-      this.body?.velocity.y ?? 0,
-      this.body?.velocity.x ?? 0
-    );
+    this.rotation = Math.atan2(this.body?.velocity.y ?? 0, this.body?.velocity.x ?? 0);
 
     this.checkBounds();
   }
@@ -153,8 +164,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const screenWidth = this.scene.cameras.main.width;
     const screenHeight = this.scene.cameras.main.height;
 
-    if (this.x < -buffer || this.x > screenWidth + buffer ||
-      this.y < -buffer || this.y > screenHeight + buffer) {
+    if (
+      this.x < -buffer ||
+      this.x > screenWidth + buffer ||
+      this.y < -buffer ||
+      this.y > screenHeight + buffer
+    ) {
       this.returnToPool();
     }
   }
@@ -189,7 +204,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   private getDirection(): Vec2 {
     if (Vec2.equals(this.baseDirection, Vec2.Zero)) {
-      this.baseDirection = Vec2.directionTo(new Vec2(this.x, this.y), new Vec2(this.targetX, this.targetY));
+      this.baseDirection = Vec2.directionTo(
+        new Vec2(this.x, this.y),
+        new Vec2(this.targetX, this.targetY)
+      );
     }
     return this.baseDirection;
   }

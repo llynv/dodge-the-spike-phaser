@@ -30,7 +30,12 @@ export class EnemyPool {
     });
   }
 
-  public getEnemy(type: EnemyType, spawnDirection: SpawnDirection, x: number, y: number): Enemy | null {
+  public getEnemy(
+    type: EnemyType,
+    spawnDirection: SpawnDirection,
+    x: number,
+    y: number
+  ): Enemy | null {
     let enemy: Enemy;
 
     if (this.pool.length > 0) {
@@ -78,7 +83,7 @@ export class EnemyPool {
     return {
       active: this.activeEnemies.size,
       pooled: this.pool.length,
-      total: this.activeEnemies.size + this.pool.length
+      total: this.activeEnemies.size + this.pool.length,
     };
   }
 

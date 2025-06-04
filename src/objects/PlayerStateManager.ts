@@ -4,7 +4,7 @@ export enum PlayerState {
   IDLE = 'idle',
   RUNNING = 'running',
   JUMPING = 'jumping',
-  FALLING = 'falling'
+  FALLING = 'falling',
 }
 
 export class PlayerStateManager {
@@ -70,7 +70,10 @@ export class PlayerStateManager {
         this.sprite.play(animKey);
       }
     } else {
-      if (this.sprite.scene.anims.exists('player_idle') && this.sprite.anims.currentAnim?.key !== 'player_idle') {
+      if (
+        this.sprite.scene.anims.exists('player_idle') &&
+        this.sprite.anims.currentAnim?.key !== 'player_idle'
+      ) {
         this.sprite.play('player_idle');
       }
     }

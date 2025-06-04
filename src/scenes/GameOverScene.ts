@@ -9,7 +9,7 @@ export class GameOverScene extends Phaser.Scene {
       TEXT: 'Restart',
       BACKGROUND_COLOR: '#3498db',
       HOVER_COLOR: '#2980b9',
-      TEXT_COLOR: '#ffffff'
+      TEXT_COLOR: '#ffffff',
     },
     HIGH_SCORES: {
       WIDTH: 150,
@@ -17,8 +17,8 @@ export class GameOverScene extends Phaser.Scene {
       TEXT: 'High Scores',
       BACKGROUND_COLOR: '#e74c3c',
       HOVER_COLOR: '#c0392b',
-      TEXT_COLOR: '#ffffff'
-    }
+      TEXT_COLOR: '#ffffff',
+    },
   };
 
   private gameOverBackground!: Phaser.GameObjects.Rectangle;
@@ -59,37 +59,43 @@ export class GameOverScene extends Phaser.Scene {
     const popup = this.add.rectangle(0, 0, 600, 400, 0x2c3e50);
     popup.setStrokeStyle(3, 0x34495e);
 
-    const title = this.add.text(0, -100, 'GAME OVER', {
-      fontSize: '32px',
-      color: '#e74c3c',
-      fontStyle: 'bold',
-      stroke: 'rgba(0, 0, 0, 0.9)',
-      strokeThickness: 4,
-      shadow: {
-        offsetX: 2,
-        offsetY: 2,
-        color: 'rgba(0, 0, 0, 0.9)',
-        blur: 4,
-        stroke: true,
-        fill: true
-      }
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(0, -100, 'GAME OVER', {
+        fontSize: '32px',
+        color: '#e74c3c',
+        fontStyle: 'bold',
+        stroke: 'rgba(0, 0, 0, 0.9)',
+        strokeThickness: 4,
+        shadow: {
+          offsetX: 2,
+          offsetY: 2,
+          color: 'rgba(0, 0, 0, 0.9)',
+          blur: 4,
+          stroke: true,
+          fill: true,
+        },
+      })
+      .setOrigin(0.5);
 
-    this.scoreText = this.add.text(0, -50, `Your Score: ${this.currentScore} points`, {
-      fontSize: '24px',
-      color: '#ecf0f1',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    this.scoreText = this.add
+      .text(0, -50, `Your Score: ${this.currentScore} points`, {
+        fontSize: '24px',
+        color: '#ecf0f1',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     const restartBtn = this.createMenuButton(
-      -75, 50,
+      -75,
+      50,
       this.MENU_BUTTONS.RESTART.TEXT,
       this.MENU_BUTTONS.RESTART,
       () => this.restartGame()
     );
 
     const highScoreBtn = this.createMenuButton(
-      75, 50,
+      75,
+      50,
       this.MENU_BUTTONS.HIGH_SCORES.TEXT,
       this.MENU_BUTTONS.HIGH_SCORES,
       () => this.goToHighScores()
@@ -99,21 +105,30 @@ export class GameOverScene extends Phaser.Scene {
     this.gameOverContainer.setDepth(1001);
   }
 
-  private createMenuButton(x: number, y: number, text: string, config: any, onClick: () => void): Phaser.GameObjects.Container {
+  private createMenuButton(
+    x: number,
+    y: number,
+    text: string,
+    config: any,
+    onClick: () => void
+  ): Phaser.GameObjects.Container {
     const button = this.add.container(x, y);
 
     const bg = this.add.rectangle(
-      0, 0,
+      0,
+      0,
       config.WIDTH,
       config.HEIGHT,
       Phaser.Display.Color.HexStringToColor(config.BACKGROUND_COLOR).color
     );
 
-    const buttonText = this.add.text(0, 0, text, {
-      fontSize: '18px',
-      color: config.TEXT_COLOR,
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    const buttonText = this.add
+      .text(0, 0, text, {
+        fontSize: '18px',
+        color: config.TEXT_COLOR,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     button.add([bg, buttonText]);
     button.setSize(config.WIDTH, config.HEIGHT);
@@ -146,18 +161,15 @@ export class GameOverScene extends Phaser.Scene {
     if (this.currentScore > bestScore) {
       localStorage.setItem('bestScore', this.currentScore.toString());
 
-      const newHighScoreText = this.add.text(
-        this.scale.width / 2,
-        this.scale.height / 2 - 20,
-        'NEW HIGH SCORE!',
-        {
+      const newHighScoreText = this.add
+        .text(this.scale.width / 2, this.scale.height / 2 - 20, 'NEW HIGH SCORE!', {
           fontSize: '20px',
           color: '#f1c40f',
           fontStyle: 'bold',
           stroke: 'rgba(0, 0, 0, 0.8)',
-          strokeThickness: 2
-        }
-      ).setOrigin(0.5);
+          strokeThickness: 2,
+        })
+        .setOrigin(0.5);
       newHighScoreText.setDepth(1002);
 
       this.tweens.add({
@@ -165,7 +177,7 @@ export class GameOverScene extends Phaser.Scene {
         alpha: { from: 0.7, to: 1 },
         duration: 800,
         yoyo: true,
-        repeat: -1
+        repeat: -1,
       });
     }
   }
