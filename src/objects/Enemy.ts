@@ -202,11 +202,15 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return this.isActive && this.visible && this.active;
   }
 
+  private getRandomOffsetY(): number {
+    return Math.random() * 60 + 40;
+  }
+
   private getDirection(): Vec2 {
     if (Vec2.equals(this.baseDirection, Vec2.Zero)) {
       this.baseDirection = Vec2.directionTo(
         new Vec2(this.x, this.y),
-        new Vec2(this.targetX, this.targetY)
+        new Vec2(this.targetX, this.targetY - this.getRandomOffsetY())
       );
     }
     return this.baseDirection;

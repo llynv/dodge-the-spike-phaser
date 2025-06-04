@@ -10,6 +10,10 @@ export class EnemySpawner {
   private scene: Phaser.Scene;
   private enemyPool: EnemyPool;
   private player: Player | undefined;
+  private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
+  private platformHeight: number = 0;
+  private screenWidth: number = 0;
+  private screenHeight: number = 0;
 
   private readonly CONFIG = {
     INITIAL_SPAWN_RATE: 2000,
@@ -36,10 +40,20 @@ export class EnemySpawner {
     this.scene = scene;
     this.enemyPool = new EnemyPool(scene);
     this.currentSpawnRate = this.CONFIG.INITIAL_SPAWN_RATE;
+
+    this.screenWidth = this.scene.cameras.main.width;
+    this.screenHeight = this.scene.cameras.main.height;
   }
 
   public setPlayer(player: Player): void {
     this.player = player;
+  }
+
+  public setPlatforms(platforms: Phaser.Physics.Arcade.StaticGroup): void {
+    this.platforms = platforms;
+    this.platformHeight = this.platforms.getChildren().reduce((max, platform) => {
+      return Math.max(max, (platform.body as Phaser.Physics.Arcade.Body).height);
+    }, 0);
   }
 
   public update(time: number, delta: number): void {
@@ -89,26 +103,24 @@ export class EnemySpawner {
   }
 
   private getSpawnPosition(direction: SpawnDirection): { x: number; y: number } {
-    const screenWidth = this.scene.cameras.main.width;
-    const screenHeight = this.scene.cameras.main.height;
     const enemySize = 50;
 
     switch (direction) {
       case SpawnDirection.LEFT:
         return {
           x: -enemySize,
-          y: MathUtils.random(enemySize, screenHeight - enemySize),
+          y: MathUtils.random(enemySize, this.screenHeight - enemySize - this.platformHeight),
         };
 
       case SpawnDirection.RIGHT:
         return {
-          x: screenWidth + enemySize,
-          y: MathUtils.random(enemySize, screenHeight - enemySize),
+          x: this.screenWidth + enemySize,
+          y: MathUtils.random(enemySize, this.screenHeight - enemySize - this.platformHeight),
         };
 
       case SpawnDirection.TOP:
         return {
-          x: MathUtils.random(enemySize, screenWidth - enemySize),
+          x: MathUtils.random(enemySize, this.screenWidth - enemySize - this.platformHeight),
           y: -enemySize,
         };
 
