@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { StateMachine, StateHandler } from '../utils/StateMachine';
 
 export enum PlayerState {
   IDLE = 'idle',
@@ -8,61 +9,91 @@ export enum PlayerState {
 }
 
 export class PlayerStateManager {
-  private currentState: PlayerState = PlayerState.IDLE;
+  private stateMachine: StateMachine<PlayerState>;
   private sprite: Phaser.Physics.Arcade.Sprite;
 
   constructor(sprite: Phaser.Physics.Arcade.Sprite) {
     this.sprite = sprite;
+
+    const validTransitions = new Map<PlayerState, PlayerState[]>();
+    validTransitions.set(PlayerState.IDLE, [
+      PlayerState.RUNNING,
+      PlayerState.JUMPING,
+      PlayerState.FALLING,
+    ]);
+    validTransitions.set(PlayerState.RUNNING, [
+      PlayerState.IDLE,
+      PlayerState.JUMPING,
+      PlayerState.FALLING,
+    ]);
+    validTransitions.set(PlayerState.JUMPING, [PlayerState.FALLING]);
+    validTransitions.set(PlayerState.FALLING, [
+      PlayerState.IDLE,
+      PlayerState.RUNNING,
+      PlayerState.JUMPING,
+    ]);
+
+    const stateHandlers = new Map<PlayerState, StateHandler<PlayerState>>();
+
+    stateHandlers.set(PlayerState.IDLE, {
+      onEnter: () => this.playAnimationSafe('player_idle'),
+      onUpdate: () => this.updateIdleState(),
+    });
+
+    stateHandlers.set(PlayerState.RUNNING, {
+      onEnter: () => this.playAnimationSafe('player_run'),
+      onUpdate: () => this.updateRunningState(),
+    });
+
+    stateHandlers.set(PlayerState.JUMPING, {
+      onEnter: () => this.playAnimationSafe('player_jump'),
+      onUpdate: () => this.updateJumpingState(),
+    });
+
+    stateHandlers.set(PlayerState.FALLING, {
+      onEnter: () => this.playAnimationSafe('player_jump'),
+      onUpdate: () => this.updateFallingState(),
+    });
+
+    this.stateMachine = new StateMachine({
+      initialState: PlayerState.IDLE,
+      validTransitions,
+      stateHandlers,
+      enableLogging: false,
+    });
   }
 
-  public update(isReversed: boolean): void {
-    this.updateState();
-    this.updateAnimations(isReversed);
-  }
-
-  private updateState(): void {
-    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    const velocity = { x: body.velocity.x, y: body.velocity.y };
-    const isJumping = !body.touching.down;
-
-    if (isJumping) {
-      if (velocity.y < 0) {
-        this.currentState = PlayerState.JUMPING;
-      } else {
-        this.currentState = PlayerState.FALLING;
-      }
-    } else {
-      if (Math.abs(velocity.x) > 10) {
-        this.currentState = PlayerState.RUNNING;
-      } else {
-        this.currentState = PlayerState.IDLE;
-      }
-    }
-  }
-
-  private updateAnimations(isReversed: boolean): void {
+  public update(isReversed: boolean, deltaTime: number = 0): void {
     this.sprite.setFlipX(isReversed);
 
-    let animKey: string;
-    switch (this.currentState) {
-      case PlayerState.IDLE:
-        animKey = 'player_idle';
-        break;
-      case PlayerState.RUNNING:
-        animKey = 'player_run';
-        break;
-      case PlayerState.JUMPING:
-        animKey = 'player_jump';
-        break;
-      case PlayerState.FALLING:
-        animKey = 'player_jump';
-        break;
-      default:
-        animKey = 'player_idle';
+    const newState = this.determineState();
+
+    if (newState !== this.stateMachine.getCurrentState()) {
+      this.stateMachine.transitionTo(newState);
     }
 
-    this.playAnimationSafe(animKey);
+    this.stateMachine.update(deltaTime);
   }
+
+  private determineState(): PlayerState {
+    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    const velocity = { x: body.velocity.x, y: body.velocity.y };
+    const isOnGround = body.touching.down;
+
+    if (!isOnGround) {
+      return velocity.y < 0 ? PlayerState.JUMPING : PlayerState.FALLING;
+    } else {
+      return Math.abs(velocity.x) > 10 ? PlayerState.RUNNING : PlayerState.IDLE;
+    }
+  }
+
+  private updateIdleState(): void {}
+
+  private updateRunningState(): void {}
+
+  private updateJumpingState(): void {}
+
+  private updateFallingState(): void {}
 
   private playAnimationSafe(animKey: string): void {
     if (this.sprite.scene.anims.exists(animKey)) {
@@ -80,10 +111,41 @@ export class PlayerStateManager {
   }
 
   public getCurrentState(): PlayerState {
-    return this.currentState;
+    return this.stateMachine.getCurrentState();
+  }
+
+  public getPreviousState(): PlayerState | undefined {
+    return this.stateMachine.getPreviousState();
   }
 
   public getIsJumping(): boolean {
-    return this.currentState === PlayerState.JUMPING || this.currentState === PlayerState.FALLING;
+    return (
+      this.stateMachine.isInState(PlayerState.JUMPING) ||
+      this.stateMachine.isInState(PlayerState.FALLING)
+    );
+  }
+
+  public isInState(state: PlayerState): boolean {
+    return this.stateMachine.isInState(state);
+  }
+
+  public wasInState(state: PlayerState): boolean {
+    return this.stateMachine.wasInState(state);
+  }
+
+  public addStateChangeCallback(
+    callback: (newState: PlayerState, oldState?: PlayerState | undefined) => void
+  ): void {
+    this.stateMachine.addStateChangeCallback(callback);
+  }
+
+  public removeStateChangeCallback(
+    callback: (newState: PlayerState, oldState?: PlayerState | undefined) => void
+  ): void {
+    this.stateMachine.removeStateChangeCallback(callback);
+  }
+
+  public reset(): void {
+    this.stateMachine.reset(PlayerState.IDLE);
   }
 }

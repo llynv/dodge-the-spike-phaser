@@ -35,7 +35,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.stateManager = new PlayerStateManager(this);
     this.controller = new PlayerController(this, scene);
 
-    this.stateManager.update(false);
+    this.stateManager.update(false, 0);
   }
 
   public override update(time: number, delta: number): void {
@@ -43,7 +43,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.controller.update(deltaTime);
     this.health.update(deltaTime);
-    this.stateManager.update(this.controller.getIsReversed());
+    this.stateManager.update(this.controller.getIsReversed(), deltaTime);
 
     this.handleOutOfBounds();
   }
@@ -76,6 +76,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return this.stateManager.getCurrentState();
   }
 
+  public getPreviousState(): PlayerState | undefined {
+    return this.stateManager.getPreviousState();
+  }
+
   public getVelocity(): { x: number; y: number } {
     return this.controller.getVelocity();
   }
@@ -88,11 +92,28 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return this.controller.getIsReversed();
   }
 
+  public isInState(state: PlayerState): boolean {
+    return this.stateManager.isInState(state);
+  }
+
+  public wasInState(state: PlayerState): boolean {
+    return this.stateManager.wasInState(state);
+  }
+
+  public getIsInvulnerable(): boolean {
+    return this.health.getIsInvulnerable();
+  }
+
   public reset(): void {
     this.health.reset();
+    this.stateManager.reset();
   }
 
   public getController(): PlayerController {
     return this.controller;
+  }
+
+  public getStateManager(): PlayerStateManager {
+    return this.stateManager;
   }
 }
