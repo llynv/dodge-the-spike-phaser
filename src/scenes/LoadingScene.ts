@@ -26,16 +26,20 @@ export class LoadingScene extends Phaser.Scene {
 
     this.add.rectangle(centerX, centerY, screenWidth, screenHeight, 0x2c3e50);
 
-    this.add.text(centerX, screenHeight * 0.3, 'DODGE THE SPIKE', {
-      fontSize: '48px',
-      color: '#ffffff',
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
+    this.add
+      .text(centerX, screenHeight * 0.3, 'DODGE THE SPIKE', {
+        fontSize: '48px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
-    this.add.text(centerX, screenHeight * 0.4, 'Loading...', {
-      fontSize: '24px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
+    this.add
+      .text(centerX, screenHeight * 0.4, 'Loading...', {
+        fontSize: '24px',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5);
 
     const loadingBarWidth = Math.min(400, screenWidth * 0.6);
     const loadingBarBg = this.add.rectangle(centerX, centerY, loadingBarWidth, 30, 0x34495e);
@@ -44,10 +48,12 @@ export class LoadingScene extends Phaser.Scene {
     const loadingBar = this.add.rectangle(centerX, centerY, loadingBarWidth - 4, 26, 0x3498db);
     loadingBar.scaleX = 0;
 
-    const loadingText = this.add.text(centerX, screenHeight * 0.6, 'Loading Assets... 0%', {
-      fontSize: '18px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
+    const loadingText = this.add
+      .text(centerX, screenHeight * 0.6, 'Loading Assets... 0%', {
+        fontSize: '18px',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5);
 
     this.load.on('progress', (progress: number) => {
       loadingBar.scaleX = progress;
@@ -66,19 +72,23 @@ export class LoadingScene extends Phaser.Scene {
 
     this.load.spritesheet('player_idle', 'assets/animations/player/idle/player_idle.png', {
       frameWidth: 155,
-      frameHeight: 280
+      frameHeight: 280,
     });
     this.load.spritesheet('player_jump', 'assets/animations/player/jump/player_jump.png', {
       frameWidth: 155,
-      frameHeight: 280
+      frameHeight: 280,
     });
     this.load.spritesheet('player_run', 'assets/animations/player/run/player_run.png', {
       frameWidth: 155,
-      frameHeight: 280
+      frameHeight: 280,
     });
-    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/enemy_fire.png', {
+    this.load.spritesheet('enemy_fire', 'assets/animations/enemy/fire/enemy_fire.png', {
       frameWidth: 48,
-      frameHeight: 48
+      frameHeight: 48,
+    });
+    this.load.spritesheet('enemy_explode', 'assets/animations/enemy/explode/enemy_explode.png', {
+      frameWidth: 32,
+      frameHeight: 32,
     });
 
     this.load.on('loaderror', (file: any) => {
@@ -87,43 +97,17 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private createAnimations() {
-    this.createAnimation(
-      'player_idle',
-      'player_idle',
-      20,
-      -1
-    );
+    this.createAnimation('player_idle', 'player_idle', 20, -1);
 
-    this.createAnimation(
-      'player_jump',
-      'player_jump',
-      8,
-      -1,
-    );
+    this.createAnimation('player_jump', 'player_jump', 8, -1);
 
-    this.createAnimation(
-      'player_run',
-      'player_run',
-      20,
-      -1
-    );
+    this.createAnimation('player_run', 'player_run', 20, -1);
 
-    this.createAnimation(
-      'player_fall',
-      'player_jump',
-      8,
-      -1,
-      true
-    );
+    this.createAnimation('player_fall', 'player_jump', 8, -1, true);
 
-    this.createAnimation(
-      'enemy_fire',
-      'enemy_fire',
-      12,
-      -1,
-      false,
-      8
-    );
+    this.createAnimation('enemy_explode', 'enemy_explode', 6, -1);
+
+    this.createAnimation('enemy_fire', 'enemy_fire', 12, -1, false, 8);
   }
 
   private createAnimation(
@@ -145,23 +129,24 @@ export class LoadingScene extends Phaser.Scene {
         const endFrame = totalFrames - 1;
         frames = this.anims.generateFrameNumbers(textureKey, { start: startFrame, end: endFrame });
       } else {
-        frames = this.anims.generateFrameNumbers(textureKey, { start: 0, end: this.textures.get(textureKey).frameTotal - 1 });
+        frames = this.anims.generateFrameNumbers(textureKey, {
+          start: 0,
+          end: this.textures.get(textureKey).frameTotal - 1,
+        });
       }
-
-      console.log(`Creating animation ${animKey} with ${frames.length} frames`);
 
       this.anims.create({
         key: animKey,
         frames: frames,
         frameRate: frameRate,
-        repeat: repeat
+        repeat: repeat,
       });
     } else {
       this.anims.create({
         key: animKey,
         frames: [{ key: textureKey, frame: 0 }],
         frameRate: frameRate,
-        repeat: repeat
+        repeat: repeat,
       });
     }
   }

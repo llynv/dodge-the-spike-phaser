@@ -8,7 +8,7 @@ export class ServiceContainer {
   private factories: Map<string, () => unknown> = new Map();
   private singletons: Map<string, unknown> = new Map();
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ServiceContainer {
     if (!ServiceContainer.instance) {

@@ -11,8 +11,7 @@ export class GameManager {
   private pauseCallbacks: (() => void)[] = [];
   private resumeCallbacks: (() => void)[] = [];
 
-  private constructor() {
-  }
+  private constructor() {}
 
   public static getInstance(): GameManager {
     if (GameManager.instance === null) {
@@ -43,7 +42,7 @@ export class GameManager {
     let elapsed = now - this.startTime - this.totalPauseTime;
 
     if (this.isPaused && this.pauseTime > 0) {
-      elapsed -= (now - this.pauseTime);
+      elapsed -= now - this.pauseTime;
     }
 
     return Math.max(0, elapsed);
