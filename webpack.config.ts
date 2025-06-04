@@ -10,6 +10,7 @@ module.exports = {
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js',
     clean: true,
+    publicPath: '/dodge-the-spike-phaser/',
   },
   module: {
     rules: [

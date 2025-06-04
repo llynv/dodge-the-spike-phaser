@@ -9,6 +9,8 @@ import { GameOverScene } from './scenes/GameOverScene';
 import { ServiceConfig } from './interface/serviceConfig';
 import { ServiceBootstrapper } from './services/ServiceBootstrapper';
 
+console.log('Game starting...', window.location.href);
+
 function getGameDimensions() {
   const isLandscape = window.innerWidth > window.innerHeight;
   const isDesktop = window.innerWidth >= 1024;
@@ -35,6 +37,7 @@ function getGameDimensions() {
 }
 
 const dimensions = getGameDimensions();
+console.log('Game dimensions:', dimensions);
 
 const bootstrapper = new ServiceBootstrapper();
 const serviceConfig: ServiceConfig = {
@@ -68,13 +71,18 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 1000 },
-      debug: true,
+      debug: false,
     },
   },
   scene: [LoadingScene, StartScene, GameScene, HighScoreScene, OptionsScene, GameOverScene],
 };
 
+console.log('Creating Phaser game...');
 const game = new Phaser.Game(config);
+
+game.events.on('ready', () => {
+  console.log('Phaser game ready!');
+});
 
 window.addEventListener('orientationchange', () => {
   setTimeout(() => {
@@ -88,4 +96,12 @@ window.addEventListener('resize', () => {
   const newDimensions = getGameDimensions();
   game.scale.setGameSize(newDimensions.width, newDimensions.height);
   game.scale.refresh();
+});
+
+window.addEventListener('error', event => {
+  console.error('Global error:', event.error);
+});
+
+window.addEventListener('unhandledrejection', event => {
+  console.error('Unhandled promise rejection:', event.reason);
 });
