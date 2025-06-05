@@ -68,11 +68,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     body.setCollideWorldBounds(false);
     body.setBounce(0, 0);
 
-    if (type && spawnDirection) {
-      this.initialize(type, spawnDirection);
-    } else {
-      this.reset();
-    }
+    type && spawnDirection ? this.initialize(type, spawnDirection) : this.reset();
   }
 
   public initialize(type: EnemyType, spawnDirection: SpawnDirection): void {
@@ -120,35 +116,23 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.setScale(config.SCALE);
 
-    if (this.body) {
-      this.body.setSize(this.width / 2, this.height / 2);
-      this.body.setOffset(this.width / 4, this.height / 4);
-    }
+    this.body?.setSize(this.width / 2, this.height / 2);
+    this.body?.setOffset(this.width / 4, this.height / 4);
 
     this.moveSpeed = config.SPEED;
     this.damageValue = config.DAMAGE;
   }
 
   private handleSpriteOrientation(): void {
-    if (
+    const isFlipped =
       this.spawnDirection === SpawnDirection.RIGHT ||
-      (this.spawnDirection === SpawnDirection.TOP && this.x > this.targetX)
-    ) {
-      this.setFlipY(true);
-    } else {
-      this.setFlipY(false);
-    }
+      (this.spawnDirection === SpawnDirection.TOP && this.x > this.targetX);
+
+    this.setFlipY(isFlipped);
   }
 
   public override update(time: number, delta: number): void {
-    if (
-      !this.isActive ||
-      !this.visible ||
-      GameManager.getInstance().getIsPaused() ||
-      GameManager.getInstance().getIsGameOver()
-    ) {
-      return;
-    }
+    if (!this.isActive || !this.visible || GameManager.getInstance().getIsPaused()) return;
 
     const direction = this.getDirection();
     this.body?.velocity.set(direction.x * this.moveSpeed, direction.y * this.moveSpeed);
@@ -170,9 +154,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.x > screenWidth + buffer ||
       this.y < -buffer ||
       this.y > screenHeight + buffer
-    ) {
+    )
       this.returnToPoolSilently();
-    }
   }
 
   public returnToPool(): void {
@@ -180,18 +163,18 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public returnToPoolWithExplosion(): void {
-    if (this.isActive) {
-      this.createExplosion();
-      this.reset();
-      this.scene.events.emit('enemy-return-to-pool', this);
-    }
+    if (!this.isActive) return;
+
+    this.createExplosion();
+    this.reset();
+    this.scene.events.emit('enemy-return-to-pool', this);
   }
 
   public returnToPoolSilently(): void {
-    if (this.isActive) {
-      this.reset();
-      this.scene.events.emit('enemy-return-to-pool', this);
-    }
+    if (!this.isActive) return;
+
+    this.reset();
+    this.scene.events.emit('enemy-return-to-pool', this);
   }
 
   private createExplosion(): void {
@@ -218,9 +201,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public explodeAndReturnToPool(): void {
-    if (this.isActive) {
-      this.returnToPoolWithExplosion();
-    }
+    if (!this.isActive) return;
+
+    this.returnToPoolWithExplosion();
   }
 
   public getType(): EnemyType {
@@ -259,8 +242,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override destroy(fromScene?: boolean): void {
-    if (this.isActive) {
-      this.explodeAndReturnToPool();
-    }
+    if (!this.isActive) return;
+
+    this.explodeAndReturnToPool();
   }
 }
