@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AudioService } from '../services/AudioService';
 
 export class StartScene extends Phaser.Scene {
   private readonly TITLE = {
@@ -57,6 +58,8 @@ export class StartScene extends Phaser.Scene {
     this.createStartButton();
     this.createHighScoresButton();
     this.createCreditsText();
+
+    AudioService.getInstance().playMenuMusic();
   }
 
   private createBackground(): void {
@@ -121,6 +124,8 @@ export class StartScene extends Phaser.Scene {
     button.on('pointerover', () => {
       bg.setFillStyle(Phaser.Display.Color.HexStringToColor(this.START_BUTTON.HOVER_COLOR).color);
       button.setScale(1.05);
+      AudioService.getInstance().playButtonHover();
+      AudioService.getInstance().playMenuMusic();
     });
 
     button.on('pointerout', () => {
@@ -134,6 +139,7 @@ export class StartScene extends Phaser.Scene {
 
     button.on('pointerup', () => {
       button.setScale(1.05);
+      AudioService.getInstance().playButtonClick();
       this.scene.start('GameScene');
     });
   }
@@ -167,6 +173,8 @@ export class StartScene extends Phaser.Scene {
     button.on('pointerover', () => {
       bg.setFillStyle(Phaser.Display.Color.HexStringToColor(this.START_BUTTON.HOVER_COLOR).color);
       button.setScale(1.05);
+      AudioService.getInstance().playButtonHover();
+      AudioService.getInstance().playMenuMusic();
     });
 
     button.on('pointerout', () => {
@@ -180,6 +188,7 @@ export class StartScene extends Phaser.Scene {
 
     button.on('pointerup', () => {
       button.setScale(1.05);
+      AudioService.getInstance().playButtonClick();
       this.scene.start('HighScoreScene');
     });
   }

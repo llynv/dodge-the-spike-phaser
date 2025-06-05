@@ -56,15 +56,15 @@ export class EnemyPool {
   }
 
   public returnEnemy(enemy: Enemy): void {
-    if (this.activeEnemies.has(enemy)) {
-      this.activeEnemies.delete(enemy);
+    if (!this.activeEnemies.has(enemy)) return;
 
-      enemy.reset();
+    this.activeEnemies.delete(enemy);
 
-      if (this.pool.length < this.INITIAL_POOL_SIZE) {
-        this.pool.push(enemy);
-      }
-    }
+    enemy.reset();
+
+    if (this.pool.length >= this.INITIAL_POOL_SIZE) return;
+
+    this.pool.push(enemy);
   }
 
   public getActiveEnemies(): Enemy[] {
@@ -88,9 +88,7 @@ export class EnemyPool {
   }
 
   public clearPool(): void {
-    this.activeEnemies.forEach(enemy => {
-      enemy.reset();
-    });
+    this.activeEnemies.forEach(enemy => enemy.reset());
     this.activeEnemies.clear();
   }
 

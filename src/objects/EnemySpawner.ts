@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import { Enemy, EnemyType, SpawnDirection } from './Enemy';
 import { GameManager } from '../managers/GameManager';
 import { Player } from './Player';
-import { Vec2 } from '../utils/math/vec2';
 import { MathUtils } from '../utils/math/mathUtils';
 import { EnemyPool } from './EnemyPool';
 
@@ -57,38 +56,32 @@ export class EnemySpawner {
   }
 
   public update(time: number, delta: number): void {
-    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver())
       return;
-    }
 
     this.updateEnemies(time, delta);
 
     this.spawnTimer += delta;
 
-    if (this.spawnTimer >= this.currentSpawnRate) {
-      this.spawnEnemy();
+    if (this.spawnTimer < this.currentSpawnRate) return;
 
-      this.spawnTimer = 0;
+    this.spawnEnemy();
 
-      this.currentSpawnRate = Math.max(
-        this.CONFIG.MIN_SPAWN_RATE,
-        this.currentSpawnRate - this.CONFIG.SPAWN_RATE_DECREASE
-      );
-    }
+    this.spawnTimer = 0;
+
+    this.currentSpawnRate = Math.max(
+      this.CONFIG.MIN_SPAWN_RATE,
+      this.currentSpawnRate - this.CONFIG.SPAWN_RATE_DECREASE
+    );
   }
 
   private updateEnemies(time: number, delta: number): void {
     const activeEnemies = this.enemyPool.getActiveEnemies();
-    activeEnemies.forEach(enemy => {
-      enemy.update(time, delta);
-    });
+    activeEnemies.forEach(enemy => enemy.update(time, delta));
   }
 
   private spawnEnemy(): void {
-    if (!this.player) {
-      console.error('Enemy spawner has no target node set');
-      return;
-    }
+    if (!this.player) return;
 
     const spawnDirection = this.getRandomSpawnDirection();
     const enemyType = this.getRandomEnemyType();
@@ -137,9 +130,8 @@ export class EnemySpawner {
   private getRandomEnemyType(): EnemyType {
     let totalWeight = 0;
     for (const type in this.enemyTypeWeights) {
-      if (!this.enemyTypeWeights[type as EnemyType]) {
-        continue;
-      }
+      if (!this.enemyTypeWeights[type as EnemyType]) continue;
+
       totalWeight += this.enemyTypeWeights[type as EnemyType];
     }
 
@@ -147,9 +139,8 @@ export class EnemySpawner {
 
     let runningTotal = 0;
     for (const type in this.enemyTypeWeights) {
-      if (!this.enemyTypeWeights[type as EnemyType]) {
-        continue;
-      }
+      if (!this.enemyTypeWeights[type as EnemyType]) continue;
+
       runningTotal += this.enemyTypeWeights[type as EnemyType];
       if (random <= runningTotal) {
         return type as EnemyType;
