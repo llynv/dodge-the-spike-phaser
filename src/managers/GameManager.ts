@@ -76,9 +76,13 @@ export class GameManager {
     this.elapsedTime = elapsedTime;
   }
 
-  public setIsGameOver = (gameOver: boolean) =>
-    gameOver ? (this.isPaused = false) : (this.isGameOver = gameOver);
+  public setIsGameOver(gameOver: boolean): void {
+    this.isGameOver = gameOver;
+    if (!gameOver) return;
 
+    this.isPaused = false;
+  }
+ 
   public addPauseCallback(callback: () => void): void {
     this.pauseCallbacks.push(callback);
   }
