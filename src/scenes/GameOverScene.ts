@@ -89,7 +89,7 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const restartBtn = this.createMenuButton(
-      -75,
+      -90,
       50,
       this.MENU_BUTTONS.RESTART.TEXT,
       this.MENU_BUTTONS.RESTART,
@@ -97,7 +97,7 @@ export class GameOverScene extends Phaser.Scene {
     );
 
     const highScoreBtn = this.createMenuButton(
-      75,
+      90,
       50,
       this.MENU_BUTTONS.HIGH_SCORES.TEXT,
       this.MENU_BUTTONS.HIGH_SCORES,
