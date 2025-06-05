@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GameManager } from '../managers/GameManager';
 import { Vec2 } from '../utils/math/vec2';
+import { AudioService } from '../services/AudioService';
 
 export enum SpawnDirection {
   LEFT = 'left',
@@ -195,6 +196,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   private createExplosion(): void {
     const explosion = this.scene.add.sprite(this.x, this.y, 'enemy_explode');
+
+    AudioService.getInstance().playEnemyExplode();
 
     const explosionScale = this.scale * 1.2;
     explosion.setScale(explosionScale);

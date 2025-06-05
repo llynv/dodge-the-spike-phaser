@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { StateMachine, StateHandler } from '../utils/StateMachine';
+import { AudioService } from '../services/AudioService';
 
 export enum PlayerState {
   IDLE = 'idle',
@@ -46,13 +47,17 @@ export class PlayerStateManager {
     });
 
     stateHandlers.set(PlayerState.JUMPING, {
-      onEnter: () => this.playAnimationSafe('player_jump'),
+      onEnter: () => {
+        this.playAnimationSafe('player_jump');
+        AudioService.getInstance().playPlayerJump();
+      },
       onUpdate: () => this.updateJumpingState(),
     });
 
     stateHandlers.set(PlayerState.FALLING, {
       onEnter: () => this.playAnimationSafe('player_jump'),
       onUpdate: () => this.updateFallingState(),
+      onExit: () => this.exitFallingState(),
     });
 
     this.stateMachine = new StateMachine({
@@ -94,6 +99,13 @@ export class PlayerStateManager {
   private updateJumpingState(): void {}
 
   private updateFallingState(): void {}
+
+  private exitFallingState(): void {
+    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    if (body.touching.down) {
+      AudioService.getInstance().playPlayerLand();
+    }
+  }
 
   private playAnimationSafe(animKey: string): void {
     if (this.sprite.scene.anims.exists(animKey)) {

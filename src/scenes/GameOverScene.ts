@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GameManager } from '../managers/GameManager';
+import { AudioService } from '../services/AudioService';
 
 export class GameOverScene extends Phaser.Scene {
   private readonly MENU_BUTTONS = {
@@ -36,6 +37,9 @@ export class GameOverScene extends Phaser.Scene {
     this.createGameOverOverlay();
     this.createGameOverUI();
     this.saveScore();
+
+    AudioService.getInstance().stopAllMusic();
+    AudioService.getInstance().playGameOver();
 
     GameManager.getInstance().setIsGameOver(true);
   }
@@ -136,6 +140,7 @@ export class GameOverScene extends Phaser.Scene {
     button.on('pointerover', () => {
       bg.setFillStyle(Phaser.Display.Color.HexStringToColor(config.HOVER_COLOR).color);
       button.setScale(1.05);
+      AudioService.getInstance().playButtonHover();
     });
 
     button.on('pointerout', () => {
@@ -149,6 +154,7 @@ export class GameOverScene extends Phaser.Scene {
 
     button.on('pointerup', () => {
       button.setScale(1.05);
+      AudioService.getInstance().playButtonClick();
       onClick();
     });
 
@@ -192,5 +198,6 @@ export class GameOverScene extends Phaser.Scene {
     this.scene.stop();
     this.scene.get('GameScene').scene.stop();
     this.scene.start('HighScoreScene');
+    AudioService.getInstance().playMenuMusic();
   }
 }

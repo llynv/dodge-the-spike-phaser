@@ -1,4 +1,5 @@
 import { GameManager } from '../managers/GameManager';
+import { AudioService } from '../services/AudioService';
 
 export class PlayerHealth {
   private readonly MAX_HEALTH = 100;
@@ -46,6 +47,8 @@ export class PlayerHealth {
       return true;
     }
 
+    AudioService.getInstance().playPlayerHurt();
+
     this.invulnerabilityTimer = !this.isInvulnerable ? this.INVULNERABILITY_DURATION : 0;
     this.isInvulnerable = true;
 
@@ -53,6 +56,7 @@ export class PlayerHealth {
   }
 
   private die(): void {
+    AudioService.getInstance().playPlayerDie();
     GameManager.getInstance().setIsGameOver(true);
   }
 

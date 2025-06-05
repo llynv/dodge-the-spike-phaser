@@ -6,6 +6,7 @@ import { Enemy } from '../objects/Enemy';
 import { HighScoreService } from '../services/HighScoreService';
 import { ServiceContainer, ServiceKeys } from '../services/ServiceContainer';
 import { MobileControls } from '../ui/MobileControls';
+import { AudioService } from '../services/AudioService';
 
 export class GameScene extends Phaser.Scene {
   private readonly BACKGROUND_CHANGE_INTERVAL = 15000;
@@ -103,7 +104,8 @@ export class GameScene extends Phaser.Scene {
 
     this.events.emit('restart');
 
-    window.removeEventListener('keydown', this.handleKeyDown);
+    AudioService.getInstance().playGameMusic();
+
     window.addEventListener('keydown', this.handleKeyDown);
 
     this.createBackground();
@@ -358,10 +360,11 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.optionsButton.on('pointerdown', () => {
-      if (!GameManager.getInstance().getIsGameOver()) {
-        this.scene.launch('OptionsScene');
-      }
+      if (GameManager.getInstance().getIsGameOver()) return;
+      this.scene.launch('OptionsScene');
     });
+
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   private createPerformanceDisplay(): void {
@@ -392,8 +395,9 @@ export class GameScene extends Phaser.Scene {
 
   private showGameOver(): void {
     const currentScore = Math.floor(this.timeElapsed);
-
     this.saveScore(currentScore);
+
+    AudioService.getInstance().playGameOver();
 
     this.scene.stop();
     this.scene.launch('GameOverScene', { score: currentScore });
@@ -467,6 +471,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   shutdown() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+
     this.backgroundInterval.destroy();
     this.enemySpawner.destroy();
 

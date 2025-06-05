@@ -8,6 +8,7 @@ import { OptionsScene } from './scenes/OptionsScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { ServiceConfig } from './interface/serviceConfig';
 import { ServiceBootstrapper } from './services/ServiceBootstrapper';
+import { AudioService } from './services/AudioService';
 
 console.log('Game starting...', window.location.href);
 
