@@ -20,24 +20,22 @@ export class PlayerHealth {
   }
 
   private updateInvulnerability(deltaTime: number): void {
-    if (this.isInvulnerable) {
-      this.invulnerabilityTimer -= deltaTime * 1000;
+    if (!this.isInvulnerable) return;
 
-      const flashSpeed = 100;
-      const visible = Math.floor(this.invulnerabilityTimer / flashSpeed) % 2 === 0;
-      this.sprite.setVisible(visible);
+    this.invulnerabilityTimer -= deltaTime * 1000;
 
-      if (this.invulnerabilityTimer <= 0) {
-        this.isInvulnerable = false;
-        this.sprite.setVisible(true);
-      }
-    }
+    const flashSpeed = 100;
+    const visible = Math.floor(this.invulnerabilityTimer / flashSpeed) % 2 === 0;
+    this.sprite.setVisible(visible);
+
+    if (this.invulnerabilityTimer > 0) return;
+
+    this.isInvulnerable = false;
+    this.sprite.setVisible(true);
   }
 
   public takeDamage(damage: number): boolean {
-    if (this.isInvulnerable || GameManager.getInstance().getIsGameOver()) {
-      return false;
-    }
+    if (this.isInvulnerable || GameManager.getInstance().getIsGameOver()) return false;
 
     this.health -= damage;
 
