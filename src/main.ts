@@ -9,6 +9,7 @@ import { GameOverScene } from './scenes/GameOverScene';
 import { ServiceConfig } from './interface/serviceConfig';
 import { ServiceBootstrapper } from './services/ServiceBootstrapper';
 import { AudioService } from './services/AudioService';
+import SliderPlugin from './plugins/SliderPlugin';
 
 console.log('Game starting...', window.location.href);
 
@@ -56,6 +57,15 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: '#87CEEB',
   input: {
     activePointers: 5,
+  },
+  plugins: {
+    global: [
+      {
+        key: 'SliderPlugin',
+        plugin: SliderPlugin,
+        start: true,
+      },
+    ],
   },
   scale: {
     mode: Phaser.Scale.FIT,
