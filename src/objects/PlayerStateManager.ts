@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { StateMachine, StateHandler } from '../utils/StateMachine';
+import { AudioService } from '../services/AudioService';
 
 export enum PlayerState {
   IDLE = 'idle',
@@ -46,13 +47,17 @@ export class PlayerStateManager {
     });
 
     stateHandlers.set(PlayerState.JUMPING, {
-      onEnter: () => this.playAnimationSafe('player_jump'),
+      onEnter: () => {
+        this.playAnimationSafe('player_jump');
+        AudioService.getInstance().playPlayerJump();
+      },
       onUpdate: () => this.updateJumpingState(),
     });
 
     stateHandlers.set(PlayerState.FALLING, {
       onEnter: () => this.playAnimationSafe('player_jump'),
       onUpdate: () => this.updateFallingState(),
+      onExit: () => this.exitFallingState(),
     });
 
     this.stateMachine = new StateMachine({
@@ -80,11 +85,9 @@ export class PlayerStateManager {
     const velocity = { x: body.velocity.x, y: body.velocity.y };
     const isOnGround = body.touching.down;
 
-    if (!isOnGround) {
-      return velocity.y < 0 ? PlayerState.JUMPING : PlayerState.FALLING;
-    } else {
-      return Math.abs(velocity.x) > 10 ? PlayerState.RUNNING : PlayerState.IDLE;
-    }
+    if (!isOnGround) return velocity.y < 0 ? PlayerState.JUMPING : PlayerState.FALLING;
+
+    return Math.abs(velocity.x) > 10 ? PlayerState.RUNNING : PlayerState.IDLE;
   }
 
   private updateIdleState(): void {}
@@ -95,19 +98,26 @@ export class PlayerStateManager {
 
   private updateFallingState(): void {}
 
+  private exitFallingState(): void {
+    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
+    if (!body.touching.down) return;
+
+    AudioService.getInstance().playPlayerLand();
+  }
+
   private playAnimationSafe(animKey: string): void {
-    if (this.sprite.scene.anims.exists(animKey)) {
-      if (this.sprite.anims.currentAnim?.key !== animKey) {
-        this.sprite.play(animKey);
-      }
-    } else {
-      if (
-        this.sprite.scene.anims.exists('player_idle') &&
-        this.sprite.anims.currentAnim?.key !== 'player_idle'
-      ) {
-        this.sprite.play('player_idle');
-      }
+    if (!this.sprite.scene.anims.exists(animKey)) {
+      this.playDistinctAnimation('player_idle');
+      return;
     }
+
+    this.playDistinctAnimation(animKey);
+  }
+
+  private playDistinctAnimation(animKey: string): void {
+    if (this.sprite.anims.currentAnim?.key === animKey) return;
+
+    this.sprite.play(animKey);
   }
 
   public getCurrentState(): PlayerState {

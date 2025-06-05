@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AudioService } from '../services/AudioService';
 
 export class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -12,6 +13,7 @@ export class LoadingScene extends Phaser.Scene {
 
   create() {
     this.createAnimations();
+    AudioService.getInstance().initialize(this);
 
     this.time.delayedCall(500, () => {
       this.scene.start('StartScene');
@@ -90,6 +92,23 @@ export class LoadingScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    this.load.audio('menu_music', 'assets/audio/music/menu_music.wav');
+    this.load.audio('game_music', 'assets/audio/music/game_music.wav');
+
+    this.load.audio('player_jump', 'assets/audio/sfx/player/jump.wav');
+    this.load.audio('player_land', 'assets/audio/sfx/player/land.wav');
+    this.load.audio('player_hurt', 'assets/audio/sfx/player/hurt.wav');
+    this.load.audio('player_die', 'assets/audio/sfx/player/die.wav');
+
+    this.load.audio('enemy_explode', 'assets/audio/sfx/enemy/explode.wav');
+
+    this.load.audio('enemy_spawn', 'assets/audio/sfx/enemy/spawn.wav');
+
+    this.load.audio('button_click', 'assets/audio/sfx/ui/click.wav');
+    this.load.audio('button_hover', 'assets/audio/sfx/ui/hover.wav');
+    this.load.audio('score_increase', 'assets/audio/sfx/ui/score.wav');
+    this.load.audio('game_over', 'assets/audio/sfx/ui/game_over.wav');
 
     this.load.on('loaderror', (file: any) => {
       console.warn(`Failed to load asset: ${file.key} from ${file.url}`);

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GameManager } from '../managers/GameManager';
+import { AudioService } from '../services/AudioService';
 
 export class GameOverScene extends Phaser.Scene {
   private readonly MENU_BUTTONS = {
@@ -35,7 +36,9 @@ export class GameOverScene extends Phaser.Scene {
 
     this.createGameOverOverlay();
     this.createGameOverUI();
-    this.saveScore();
+
+    AudioService.getInstance().stopAllMusic();
+    AudioService.getInstance().playGameOver();
 
     GameManager.getInstance().setIsGameOver(true);
   }
@@ -85,7 +88,7 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const restartBtn = this.createMenuButton(
-      -75,
+      -90,
       50,
       this.MENU_BUTTONS.RESTART.TEXT,
       this.MENU_BUTTONS.RESTART,
@@ -93,7 +96,7 @@ export class GameOverScene extends Phaser.Scene {
     );
 
     const highScoreBtn = this.createMenuButton(
-      75,
+      90,
       50,
       this.MENU_BUTTONS.HIGH_SCORES.TEXT,
       this.MENU_BUTTONS.HIGH_SCORES,
@@ -136,6 +139,7 @@ export class GameOverScene extends Phaser.Scene {
     button.on('pointerover', () => {
       bg.setFillStyle(Phaser.Display.Color.HexStringToColor(config.HOVER_COLOR).color);
       button.setScale(1.05);
+      AudioService.getInstance().playButtonHover();
     });
 
     button.on('pointerout', () => {
@@ -149,36 +153,11 @@ export class GameOverScene extends Phaser.Scene {
 
     button.on('pointerup', () => {
       button.setScale(1.05);
+      AudioService.getInstance().playButtonClick();
       onClick();
     });
 
     return button;
-  }
-
-  private saveScore(): void {
-    const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
-    if (this.currentScore > bestScore) {
-      localStorage.setItem('bestScore', this.currentScore.toString());
-
-      const newHighScoreText = this.add
-        .text(this.scale.width / 2, this.scale.height / 2 - 20, 'NEW HIGH SCORE!', {
-          fontSize: '20px',
-          color: '#f1c40f',
-          fontStyle: 'bold',
-          stroke: 'rgba(0, 0, 0, 0.8)',
-          strokeThickness: 2,
-        })
-        .setOrigin(0.5);
-      newHighScoreText.setDepth(1002);
-
-      this.tweens.add({
-        targets: newHighScoreText,
-        alpha: { from: 0.7, to: 1 },
-        duration: 800,
-        yoyo: true,
-        repeat: -1,
-      });
-    }
   }
 
   private restartGame(): void {
@@ -192,5 +171,6 @@ export class GameOverScene extends Phaser.Scene {
     this.scene.stop();
     this.scene.get('GameScene').scene.stop();
     this.scene.start('HighScoreScene');
+    AudioService.getInstance().playMenuMusic();
   }
 }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { HighScoreService } from '../services/HighScoreService';
 import { ServiceContainer, ServiceKeys } from '../services/ServiceContainer';
+import { AudioService } from '../services/AudioService';
 
 export class HighScoreScene extends Phaser.Scene {
   private highScoreService: HighScoreService;
@@ -45,6 +46,8 @@ export class HighScoreScene extends Phaser.Scene {
     this.createTitle();
     this.createScoreList();
     this.createBackButton();
+
+    AudioService.getInstance().playMenuMusic();
   }
 
   private createBackground(): void {
@@ -242,6 +245,7 @@ export class HighScoreScene extends Phaser.Scene {
     button.on('pointerover', () => {
       bg.setFillStyle(Phaser.Display.Color.HexStringToColor(this.BACK_BUTTON.HOVER_COLOR).color);
       button.setScale(1.05);
+      AudioService.getInstance().playButtonHover();
     });
 
     button.on('pointerout', () => {
@@ -257,6 +261,7 @@ export class HighScoreScene extends Phaser.Scene {
 
     button.on('pointerup', () => {
       button.setScale(1.05);
+      AudioService.getInstance().playButtonClick();
       this.scene.start('StartScene');
     });
   }

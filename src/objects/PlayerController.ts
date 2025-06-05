@@ -51,9 +51,8 @@ export class PlayerController {
   }
 
   public update(deltaTime: number): void {
-    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver()) {
+    if (GameManager.getInstance().getIsPaused() || GameManager.getInstance().getIsGameOver())
       return;
-    }
 
     this.handleMovement(deltaTime);
     this.handleJump();
@@ -70,23 +69,19 @@ export class PlayerController {
     const leftPressed = leftKeyPressed || this.mobileControls.leftPressed;
     const rightPressed = rightKeyPressed || this.mobileControls.rightPressed;
 
-    if (leftPressed) {
-      this.moveDir = -1;
-      this.isReversed = true;
-    } else if (rightPressed) {
-      this.moveDir = 1;
-      this.isReversed = false;
-    }
+    this.moveDir = leftPressed ? -1 : rightPressed ? 1 : 0;
+    this.isReversed = leftPressed;
 
-    if (this.moveDir !== 0) {
-      const acceleration = this.moveDir * this.PHYSICS_CONFIG.MOVE_ACCELERATION * deltaTime;
-      body.setVelocityX(body.velocity.x + acceleration);
-
-      const limitedSpeed = Math.min(Math.abs(body.velocity.x), this.PHYSICS_CONFIG.MAX_MOVE_SPEED);
-      body.setVelocityX(limitedSpeed * Math.sign(body.velocity.x));
-    } else {
+    if (this.moveDir === 0) {
       body.setVelocityX(body.velocity.x * 0.8);
+      return;
     }
+
+    const acceleration = this.moveDir * this.PHYSICS_CONFIG.MOVE_ACCELERATION * deltaTime;
+    body.setVelocityX(body.velocity.x + acceleration);
+
+    const limitedSpeed = Math.min(Math.abs(body.velocity.x), this.PHYSICS_CONFIG.MAX_MOVE_SPEED);
+    body.setVelocityX(limitedSpeed * Math.sign(body.velocity.x));
   }
 
   private handleJump(): void {
