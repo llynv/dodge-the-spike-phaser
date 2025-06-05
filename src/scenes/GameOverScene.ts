@@ -36,7 +36,6 @@ export class GameOverScene extends Phaser.Scene {
 
     this.createGameOverOverlay();
     this.createGameOverUI();
-    this.saveScore();
 
     AudioService.getInstance().stopAllMusic();
     AudioService.getInstance().playGameOver();
@@ -159,32 +158,6 @@ export class GameOverScene extends Phaser.Scene {
     });
 
     return button;
-  }
-
-  private saveScore(): void {
-    const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
-    if (this.currentScore > bestScore) {
-      localStorage.setItem('bestScore', this.currentScore.toString());
-
-      const newHighScoreText = this.add
-        .text(this.scale.width / 2, this.scale.height / 2 - 20, 'NEW HIGH SCORE!', {
-          fontSize: '20px',
-          color: '#f1c40f',
-          fontStyle: 'bold',
-          stroke: 'rgba(0, 0, 0, 0.8)',
-          strokeThickness: 2,
-        })
-        .setOrigin(0.5);
-      newHighScoreText.setDepth(1002);
-
-      this.tweens.add({
-        targets: newHighScoreText,
-        alpha: { from: 0.7, to: 1 },
-        duration: 800,
-        yoyo: true,
-        repeat: -1,
-      });
-    }
   }
 
   private restartGame(): void {
