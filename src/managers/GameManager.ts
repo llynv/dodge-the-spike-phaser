@@ -48,13 +48,7 @@ export class GameManager {
     return Math.max(0, elapsed);
   }
 
-  public setIsPaused(isPaused: boolean): void {
-    if (isPaused) {
-      this.pause();
-    } else {
-      this.resume();
-    }
-  }
+  public setIsPaused = (isPaused: boolean) => (isPaused ? this.pause() : this.resume());
 
   private pause(): void {
     if (!this.isPaused && !this.isGameOver) {
@@ -82,12 +76,8 @@ export class GameManager {
     this.elapsedTime = elapsedTime;
   }
 
-  public setIsGameOver(gameOver: boolean): void {
-    this.isGameOver = gameOver;
-    if (gameOver) {
-      this.isPaused = false;
-    }
-  }
+  public setIsGameOver = (gameOver: boolean) =>
+    gameOver ? (this.isPaused = false) : (this.isGameOver = gameOver);
 
   public addPauseCallback(callback: () => void): void {
     this.pauseCallbacks.push(callback);
@@ -99,16 +89,16 @@ export class GameManager {
 
   public removePauseCallback(callback: () => void): void {
     const index = this.pauseCallbacks.indexOf(callback);
-    if (index !== -1) {
-      this.pauseCallbacks.splice(index, 1);
-    }
+    if (index === -1) return;
+
+    this.pauseCallbacks.splice(index, 1);
   }
 
   public removeResumeCallback(callback: () => void): void {
     const index = this.resumeCallbacks.indexOf(callback);
-    if (index !== -1) {
-      this.resumeCallbacks.splice(index, 1);
-    }
+    if (index === -1) return;
+
+    this.resumeCallbacks.splice(index, 1);
   }
 
   public reset(): void {
