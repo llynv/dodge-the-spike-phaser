@@ -8,7 +8,6 @@ import { OptionsScene } from './scenes/OptionsScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { ServiceConfig } from './interface/serviceConfig';
 import { ServiceBootstrapper } from './services/ServiceBootstrapper';
-import { AudioService } from './services/AudioService';
 import SliderPlugin from './plugins/SliderPlugin';
 
 console.log('Game starting...', window.location.href);
@@ -91,23 +90,56 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [LoadingScene, StartScene, GameScene, HighScoreScene, OptionsScene, GameOverScene],
 };
 
-console.log('Creating Phaser game...');
-const game = new Phaser.Game(config);
+window.addEventListener('load', () => {
+  const game = new Phaser.Game(config);
 
-game.events.on('ready', () => {
-  console.log('Phaser game ready!');
-});
+  const resize = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
-window.addEventListener('resize', () => {
-  const newDimensions = getGameDimensions();
-  game.scale.setGameSize(newDimensions.width, newDimensions.height);
-  game.scale.refresh();
-});
+    let width = dimensions.width;
+    let height = dimensions.height;
+    let maxWidth = dimensions.maxWidth;
+    let maxHeight = dimensions.maxHeight;
+    let scaleMode = Phaser.Scale.RESIZE;
 
-window.addEventListener('error', event => {
-  console.error('Global error:', event.error);
-});
+    let scale = Math.min(w / width, h / height);
+    let newWidth = Math.min(w / scale, maxWidth);
+    let newHeight = Math.min(h / scale, maxHeight);
 
-window.addEventListener('unhandledrejection', event => {
-  console.error('Unhandled promise rejection:', event.reason);
+    let defaultRatio = dimensions.width / dimensions.height;
+    let maxRatioWidth = dimensions.maxWidth / dimensions.height;
+    let maxRatioHeight = dimensions.width / dimensions.maxHeight;
+
+    let smooth = 1;
+    if (scaleMode === Phaser.Scale.RESIZE) {
+      const maxSmoothScale = 1.15;
+      const normalize = (value: number, min: number, max: number) => {
+        return (value - min) / (max - min);
+      };
+      if (width / height < w / h) {
+        smooth =
+          -normalize(newWidth / newHeight, defaultRatio, maxRatioWidth) /
+            (1 / (maxSmoothScale - 1)) +
+          maxSmoothScale;
+      } else {
+        smooth =
+          -normalize(newWidth / newHeight, defaultRatio, maxRatioHeight) /
+            (1 / (maxSmoothScale - 1)) +
+          maxSmoothScale;
+      }
+    }
+
+    game.scale.resize(newWidth * smooth, newHeight * smooth);
+
+    game.canvas.style.width = newWidth * scale + 'px';
+    game.canvas.style.height = newHeight * scale + 'px';
+
+    game.canvas.style.marginTop = `${(h - newHeight * scale) / 2}px`;
+    game.canvas.style.marginLeft = `${(w - newWidth * scale) / 2}px`;
+  };
+  window.addEventListener('resize', event => {
+    resize();
+  });
+  resize();
 });
