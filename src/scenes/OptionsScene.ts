@@ -157,7 +157,19 @@ export class OptionsScene extends Phaser.Scene {
       })
       .setOrigin(0, 0.5);
 
-    const slider = this.createPhaserSlider(0, 0, getVolume(), setVolume);
+    const slider = this.plugins.get('SliderPlugin').createSlider(this, {
+      x: 0,
+      y: 0,
+      width: this.AUDIO_CONTROLS.SLIDER_WIDTH,
+      height: this.AUDIO_CONTROLS.SLIDER_HEIGHT,
+      handleSize: this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE,
+      initialValue: getVolume(),
+      trackColor: 0x2c3e50,
+      fillColor: 0x27ae60,
+      handleColor: 0x27ae60,
+      handleBorderColor: 0xffffff,
+      onValueChange: setVolume,
+    });
 
     const volumeText = this.add
       .text(120, 0, `${Math.round(getVolume() * 100)}%`, {
@@ -276,117 +288,6 @@ export class OptionsScene extends Phaser.Scene {
 
     container.add([labelText, slider, volumeText, muteButton, muteIcon, muteHitArea]);
     return container;
-  }
-
-  private createPhaserSlider(
-    x: number,
-    y: number,
-    initialValue: number,
-    onValueChange: (value: number) => void
-  ): Phaser.GameObjects.Container {
-    const sliderContainer = this.add.container(x, y);
-
-    const track = this.add.graphics();
-    track.fillStyle(0x34495e, 1);
-    track.fillRoundedRect(
-      -this.AUDIO_CONTROLS.SLIDER_WIDTH / 2,
-      -this.AUDIO_CONTROLS.SLIDER_HEIGHT / 2,
-      this.AUDIO_CONTROLS.SLIDER_WIDTH,
-      this.AUDIO_CONTROLS.SLIDER_HEIGHT,
-      3
-    );
-
-    const fill = this.add.graphics();
-    const updateFill = (value: number) => {
-      fill.clear();
-      fill.fillStyle(0x3498db, 1);
-      const fillWidth = this.AUDIO_CONTROLS.SLIDER_WIDTH * value;
-      fill.fillRoundedRect(
-        -this.AUDIO_CONTROLS.SLIDER_WIDTH / 2,
-        -this.AUDIO_CONTROLS.SLIDER_HEIGHT / 2,
-        fillWidth,
-        this.AUDIO_CONTROLS.SLIDER_HEIGHT,
-        3
-      );
-    };
-
-    const handle = this.add.graphics();
-    const updateHandle = (value: number) => {
-      handle.clear();
-      handle.fillStyle(0xecf0f1, 1);
-      handle.lineStyle(2, 0x3498db, 1);
-      const handleX =
-        -this.AUDIO_CONTROLS.SLIDER_WIDTH / 2 + this.AUDIO_CONTROLS.SLIDER_WIDTH * value;
-      handle.fillCircle(handleX, 0, this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE / 2);
-      handle.strokeCircle(handleX, 0, this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE / 2);
-    };
-
-    updateFill(initialValue);
-    updateHandle(initialValue);
-
-    const sliderZone = this.add.zone(
-      0,
-      0,
-      this.AUDIO_CONTROLS.SLIDER_WIDTH + this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE,
-      this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE + 10
-    );
-    sliderZone.setInteractive();
-
-    let isDragging = false;
-    let currentValue = initialValue;
-
-    const updateSlider = (pointer: Phaser.Input.Pointer) => {
-      const localX = pointer.x - (this.scale.width / 2 + x);
-      const sliderStart = -this.AUDIO_CONTROLS.SLIDER_WIDTH / 2;
-      const sliderEnd = this.AUDIO_CONTROLS.SLIDER_WIDTH / 2;
-      const relativeX = localX - sliderStart;
-      const newValue = Phaser.Math.Clamp(relativeX / this.AUDIO_CONTROLS.SLIDER_WIDTH, 0, 1);
-
-      if (newValue !== currentValue) {
-        currentValue = newValue;
-        updateFill(newValue);
-        updateHandle(newValue);
-        onValueChange(newValue);
-        sliderContainer.emit('valuechange', newValue);
-      }
-    };
-
-    sliderZone.on('pointerover', () => {
-      handle.clear();
-      handle.fillStyle(0x3498db, 1);
-      handle.lineStyle(3, 0xecf0f1, 1);
-      const handleX =
-        -this.AUDIO_CONTROLS.SLIDER_WIDTH / 2 + this.AUDIO_CONTROLS.SLIDER_WIDTH * currentValue;
-      handle.fillCircle(handleX, 0, this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE / 2 + 1);
-      handle.strokeCircle(handleX, 0, this.AUDIO_CONTROLS.SLIDER_HANDLE_SIZE / 2 + 1);
-    });
-
-    sliderZone.on('pointerout', () => {
-      if (!isDragging) {
-        updateHandle(currentValue);
-      }
-    });
-
-    sliderZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      isDragging = true;
-      updateSlider(pointer);
-    });
-
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (isDragging) {
-        updateSlider(pointer);
-      }
-    });
-
-    this.input.on('pointerup', () => {
-      if (isDragging) {
-        isDragging = false;
-        updateHandle(currentValue);
-      }
-    });
-
-    sliderContainer.add([track, fill, handle, sliderZone]);
-    return sliderContainer;
   }
 
   private createMenuButton(
