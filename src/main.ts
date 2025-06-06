@@ -98,14 +98,6 @@ game.events.on('ready', () => {
   console.log('Phaser game ready!');
 });
 
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    const newDimensions = getGameDimensions();
-    game.scale.setGameSize(newDimensions.width, newDimensions.height);
-    game.scale.refresh();
-  }, 500);
-});
-
 window.addEventListener('resize', () => {
   const newDimensions = getGameDimensions();
   game.scale.setGameSize(newDimensions.width, newDimensions.height);
