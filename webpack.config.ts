@@ -26,6 +26,18 @@ module.exports = (env: any, argv: any) => {
           test: /\.css$/i,
           use: ['style-loader', 'css-loader'],
         },
+        {
+          test: /\.(png|jpe?g|gif|svg|ico)$/i,
+          type: 'asset',
+          parser: {
+            dataUrlCondition: {
+              maxSize: 10 * 1024,
+            },
+          },
+          generator: {
+            filename: 'assets/images/[name].[hash][ext]',
+          },
+        },
       ],
     },
     devServer: {
